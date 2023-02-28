@@ -5,6 +5,14 @@ test('download 基本用法', async () => {
   await expect(
     download({
       url: 'https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54',
+    }),
+  ).resolves.toBeUndefined();
+});
+
+test('download dest', async () => {
+  await expect(
+    download({
+      url: 'https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54',
       dest: path.join(__dirname, '_temp', 'basic'),
     }),
   ).resolves.toBeUndefined();

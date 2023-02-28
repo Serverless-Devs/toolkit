@@ -9,20 +9,18 @@ import { DEFAULT_FILENAME } from './constants';
 
 class Download {
   constructor(private config: IConfig, private options: DecompressOptions = {}) {
+    this.config.dest = this.config.dest || process.cwd();
     this.config.logger = this.config.logger || console;
     this.options.filename = this.options.filename || DEFAULT_FILENAME;
     this.validate();
   }
   private validate() {
-    const { url, dest } = this.config;
+    const { url } = this.config;
     if (!url) {
       throw new Error('url is required');
     }
     if (!url.toLowerCase().startsWith('http')) {
       throw new Error('url must be http or https');
-    }
-    if (!dest) {
-      throw new Error('dest is required');
     }
   }
 
@@ -56,7 +54,7 @@ class Download {
     await fs.unlink(filePath);
   }
   private async doDownload(url: string): Promise<string> {
-    const { dest } = this.config;
+    const dest = this.config.dest as string;
     const filename = this.options.filename as string;
     const uri = new URL(url);
     const pkg = url.toLowerCase().startsWith('https:') ? https : http;

@@ -11,12 +11,8 @@ $ npm install @serverless-devs/download --save
 
 ```ts
 import download from '@serverless-devs/download';
-import path from "path";
 
-download({
-    url: 'https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54',
-    dest: path.join(__dirname, '_temp'),
-})
+download({ url: 'https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54' })
 ```
 
 ## 参数解析
