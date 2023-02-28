@@ -11,7 +11,21 @@ class Download {
   constructor(private config: IConfig, private options: DecompressOptions = {}) {
     this.config.logger = this.config.logger || console;
     this.options.filename = this.options.filename || DEFAULT_FILENAME;
+    this.validate();
   }
+  private validate() {
+    const { url, dest } = this.config;
+    if (!url) {
+      throw new Error('url is required');
+    }
+    if (!url.toLowerCase().startsWith('http')) {
+      throw new Error('url must be http or https');
+    }
+    if (!dest) {
+      throw new Error('dest is required');
+    }
+  }
+
   async run() {
     const { logger } = this.config;
     logger.log('下载中...');
