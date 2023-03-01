@@ -31,6 +31,9 @@ class LoadApplication {
    * publish.yaml 里的数据
    */
   private publishData!: Record<string, any>;
+  /**
+   * s.yaml 的路径
+   */
   private spath!: string;
   constructor(private config: IConfig, private options: IOptions) {
     this.config.dest = this.config.dest || process.cwd();

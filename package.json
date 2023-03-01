@@ -12,7 +12,6 @@
     "test": "jest --testTimeout 10000",
     "test:download": "jest --testTimeout 10000 packages/download --watchAll",
     "test:load-application": "jest --testTimeout 10000 packages/load-application",
-    "test:request": "jest --testTimeout 10000 packages/request --watchAll"
   },
   "author": "xsahxl",
   "license": "MIT",
