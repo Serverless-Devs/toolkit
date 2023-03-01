@@ -25,7 +25,7 @@ download({url, dest, logger}, options)
 | 参数    | 说明            | 类型    | 必填 | 默认值 |
 | ------- | --------------- | ------- | ---- | ------ |
 | url | 下载地址 | string       | 是   |        |
-| dest | 文件保存路径 | string | 是   |        |
+| dest | 文件保存路径 | string | 否   |        |
 | logger | 输出日志 | Function | 否   |   console     |
 | options | 方法入参 | Options | 否   |        |
 
