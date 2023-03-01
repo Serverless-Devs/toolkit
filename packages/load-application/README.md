@@ -34,7 +34,7 @@ loadApplication({template, dest, logger}, options)
 | 参数      | 说明         | 类型                          | 必填 | 默认值        |
 | --------- | ------------ | ----------------------------- | ---- | ------------- |
 | projectName    | 文件保存时的名称         | string                | 否   |  组件名称 |
-| parameters     | 解析yaml文件时用到的参数  | Record<\string, any> | 否   | publish.yaml参数的默认值   |
+| parameters     | 解析yaml文件时用到的参数  | Record<string, any> | 否   | publish.yaml参数的默认值   |
 | appName        | 项目名称, 用于替换yaml里的name字段 |  string       | 否  |              |
 | access         | 密钥, 用于替换yaml里的access字段 |  string       | 否  |    default          |
 
