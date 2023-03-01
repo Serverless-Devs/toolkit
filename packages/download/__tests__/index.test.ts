@@ -1,6 +1,14 @@
 import download from '../src';
 import path from 'path';
 
+test('download url is empty', async () => {
+  await expect(download({ url: '' })).rejects.toThrow('url is required');
+});
+
+test('download url is abc.com', async () => {
+  await expect(download({ url: 'abc.com' })).rejects.toThrow('url must be http or https');
+});
+
 test('download 基本用法', async () => {
   await expect(
     download({

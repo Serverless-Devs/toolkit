@@ -26,14 +26,14 @@ class Download {
 
   async run() {
     const { logger } = this.config;
-    logger.log('下载中...');
+    logger.log('Downloading...');
     const { url } = this.config;
     try {
       const filePath = await this.doDownload(url);
-      this.doDecompress(filePath);
-      logger.log('下载完成');
+      await this.doDecompress(filePath);
+      logger.log('Download successfully');
     } catch (error) {
-      logger.error('下载失败');
+      logger.error('Download failed');
     }
   }
   private async doDecompress(filePath: string) {
