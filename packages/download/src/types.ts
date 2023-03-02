@@ -1,23 +1,16 @@
-import { DecompressOptions as _DecompressOptions } from 'decompress';
+import { DecompressOptions } from 'decompress';
 
-export interface IConfig {
-  /**
-   * URL to download
-   */
-  url: string;
-  /**
+export interface IOptions extends DecompressOptions {
+   /**
    * Path to where your file will be written.
    *
    * @default process.cwd()
    */
-  dest?: string;
-  /**
-   * The logger
-   */
-  logger?: any;
-}
-
-export interface DecompressOptions extends _DecompressOptions {
+   dest?: string;
+   /**
+    * The logger
+    */
+   logger?: any;
   /**
    * If set to `true`, try extracting the file using [`decompress`](https://github.com/kevva/decompress).
    *

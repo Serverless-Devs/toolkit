@@ -1,8 +1,4 @@
-export interface IConfig {
-  /**
-   * The template name
-   */
-  template: string;
+export interface IOptions {
   /**
    * Path to where your file will be written.
    *
@@ -13,9 +9,6 @@ export interface IConfig {
    * The logger
    */
   logger?: any;
-}
-
-export interface IOptions {
   /**
    * Name of the saved file.
    *

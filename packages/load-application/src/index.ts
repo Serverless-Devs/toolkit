@@ -5,7 +5,7 @@ import download from '@serverless-devs/download';
 import artTemplate from 'art-template';
 import { isEmpty, includes, split, get, find, has, set } from 'lodash';
 import parse from './parse';
-import { IConfig, IProvider, IOptions } from './types';
+import { IProvider, IOptions } from './types';
 import { REGISTRY } from './constants';
 import { getYamlPath, getYamlContent } from './utils';
 
@@ -35,9 +35,9 @@ class LoadApplication {
    * s.yaml 的路径
    */
   private spath!: string;
-  constructor(private config: IConfig, private options: IOptions) {
-    this.config.dest = this.config.dest || process.cwd();
-    this.config.logger = this.config.logger || console;
+  constructor(private template: string, private options: IOptions = {}) {
+    this.options.dest = this.options.dest || process.cwd();
+    this.options.logger = this.options.logger || console;
     this.options.access = this.options.access || 'default';
     this.validate();
     const { provider, name, version } = this.format();
@@ -45,20 +45,18 @@ class LoadApplication {
     this.name = name;
     this.version = version;
     this.options.projectName = this.options.projectName || name;
-    this.filePath = path.join(this.config.dest, this.options.projectName);
+    this.filePath = path.join(this.options.dest, this.options.projectName);
     this.tempPath = `${this.filePath}_${Date.now()}`;
   }
   private validate() {
-    const { template } = this.config;
-    if (isEmpty(template)) {
+    if (isEmpty(this.template)) {
       throw new Error('template is required');
     }
   }
   private formatProvider() {
-    const { template } = this.config;
-    const useProvider = includes(template, '/');
+    const useProvider = includes(this.template, '/');
     if (useProvider) {
-      const [provider, componentName] = split(template, '/');
+      const [provider, componentName] = split(this.template, '/');
       return {
         provider,
         componentName,
@@ -66,7 +64,7 @@ class LoadApplication {
     }
     return {
       provider: IProvider.DEVSAPP,
-      componentName: template,
+      componentName: this.template,
     };
   }
   private format() {
@@ -150,7 +148,7 @@ class LoadApplication {
   private async postInit() {
     const hookPath = path.join(this.tempPath, 'hook');
     if (!fs.existsSync(hookPath)) return;
-    const { logger } = this.config;
+    const { logger } = this.options;
     const { parameters, access } = this.options;
     const hook = await require(hookPath);
     const data = {
@@ -208,7 +206,7 @@ class LoadApplication {
   private async preInit() {
     const hookPath = path.join(this.tempPath, 'hook');
     if (!fs.existsSync(hookPath)) return;
-    const { logger } = this.config;
+    const { logger } = this.options;
     const hook = await require(hookPath);
     const data = {
       provider: this.provider,
@@ -228,14 +226,14 @@ class LoadApplication {
   }
 
   private async doLoad() {
-    const { logger } = this.config;
+    const { logger } = this.options;
     const zipball_url = this.version
       ? await this.doZipballUrlWithVersion()
       : await this.doZipballUrl();
     if (isEmpty(zipball_url)) {
       throw new Error('zipball_url is empty');
     }
-    await download({ url: zipball_url, dest: this.tempPath, logger }, { extract: true, strip: 1 });
+    await download(zipball_url, { dest: this.tempPath, logger, extract: true, strip: 1 });
   }
   private async doZipballUrl() {
     const response = await fetch(`${REGISTRY}/${this.provider}/${this.name}/releases/latest`);
@@ -253,7 +251,7 @@ class LoadApplication {
   }
 }
 
-export default async (config: IConfig, options: IOptions = {}) => {
-  const load = new LoadApplication(config, options);
+export default async (template: string, options?: IOptions) => {
+  const load = new LoadApplication(template, options);
   return await load.run();
 };
