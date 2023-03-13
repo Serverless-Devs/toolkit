@@ -18,7 +18,10 @@ importers:
       ts-jest: 29.0.5_orzzknleilowtsz34rkaotjvzm
       typescript: 4.9.5
 
-  packages/download:
+  packages/demo:
+    specifiers: {}
+
+  packages/downloads:
     specifiers:
       '@types/decompress': ^4.2.4
       '@types/fs-extra': ^11.0.1
@@ -35,7 +38,7 @@ importers:
 
   packages/load-application:
     specifiers:
-      '@serverless-devs/download': workspace:^0.0.1
+      '@serverless-devs/downloads': workspace:^0.0.1
       '@types/fs-extra': ^11.0.1
       '@types/lodash': ^4.14.191
       '@types/node-fetch': 2.x
@@ -45,7 +48,7 @@ importers:
       node-fetch: 2.x
       yaml: ^2.2.1
     dependencies:
-      '@serverless-devs/download': link:../download
+      '@serverless-devs/downloads': link:../downloads
       art-template: 4.13.2
       fs-extra: 11.1.0
       lodash: 4.17.21
@@ -55,9 +58,6 @@ importers:
       '@types/fs-extra': 11.0.1
       '@types/lodash': 4.14.191
       '@types/node-fetch': 2.6.2
-
-  packages/request:
-    specifiers: {}
 
 packages:
 
