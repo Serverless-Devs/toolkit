@@ -4,12 +4,18 @@ importers:
 
   .:
     devDependencies:
+      '@types/fs-extra':
+        specifier: ^11.0.1
+        version: 11.0.1
       '@types/jest':
         specifier: ^29.4.0
         version: 29.4.0
       '@types/node':
         specifier: ^18.15.1
         version: 18.15.1
+      fs-extra:
+        specifier: ^11.1.0
+        version: 11.1.0
       jest:
         specifier: ^29.4.3
         version: 29.4.3(@types/node@18.15.1)
@@ -83,6 +89,22 @@ importers:
       '@types/node-fetch':
         specifier: 2.x
         version: 2.6.2
+
+  packages/progress-bar:
+    dependencies:
+      chalk:
+        specifier: ^4.1.0
+        version: 4.1.2
+      progress:
+        specifier: ^2.0.3
+        version: 2.0.3
+    devDependencies:
+      '@types/progress':
+        specifier: ^2.0.3
+        version: 2.0.3
+      fs-extra:
+        specifier: ^11.1.0
+        version: 11.1.0
 
   packages/utils:
     dependencies:
@@ -792,7 +814,7 @@ packages:
     resolution: {integrity: sha512-MxObHvNl4A69ofaTRU8DFqvgzzv8s9yRtaPPm5gud9HDNvpB3GPQFvNuTWAI59B9huVGV5jXYJwbCsmBsOGYWA==}
     dependencies:
       '@types/jsonfile': 6.1.1
-      '@types/node': 18.14.2
+      '@types/node': 18.15.1
     dev: true
 
   /@types/graceful-fs@4.1.6:
@@ -855,6 +877,12 @@ packages:
 
   /@types/prettier@2.7.2:
     resolution: {integrity: sha512-KufADq8uQqo1pYKVIYzfKbJfBAc0sOeXqGbFaSpv8MRmC/zXgowNZmFcbngndGk922QDmOASEXUZCaY48gs4cg==}
+    dev: true
+
+  /@types/progress@2.0.3:
+    resolution: {integrity: sha512-bPOsfCZ4tsTlKiBjBhKnM8jpY5nmIll166IPD58D92hR7G7kZDfx5iB9wGF4NfZrdKolebjeAr3GouYkSGoJ/A==}
+    dependencies:
+      '@types/node': 18.15.1
     dev: true
 
   /@types/stack-utils@2.0.1:
@@ -1568,7 +1596,6 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
-    dev: false
 
   /fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -2247,7 +2274,6 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
-    dev: false
 
   /kleur@3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
@@ -3007,7 +3033,6 @@ packages:
   /universalify@2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
-    dev: false
 
   /update-browserslist-db@1.0.10(browserslist@4.21.5):
     resolution: {integrity: sha512-OztqDenkfFkbSG+tRxBeAnCVPckDBcvibKd35yDONx6OU8N7sqgwc7rCbkJ/WcYtVRZ4ba68d6byhC21GFh7sQ==}
