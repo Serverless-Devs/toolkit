@@ -10,7 +10,7 @@ test('ignore walk', async () => {
     includeEmpty: true,
   });
 
-  console.log('zipFiles: ', zipFiles, (zipFiles as any).includes('keep-empty-dir'))
+  // console.log('zipFiles: ', zipFiles, (zipFiles as any).includes('keep-empty-dir'))
   
   expect(zipFiles).toEqual(expect.arrayContaining([
     '.fcignore',
@@ -20,8 +20,15 @@ test('ignore walk', async () => {
     'empty-dir',
     'ignore-non-root-dir/index',
     'index.js',
-    // 'keep-empty-dir'
+    // 'keep-empty-dir', // TODO: 仅忽略根目录下的所有文件,但不忽略文件夹
   ]));
-
-  // await expect().rejects.toThrow('url is required');
+  expect(zipFiles).not.toEqual(expect.arrayContaining([
+    '.hide-dir/apt-get.list',
+    '.hide-dir/apt-get2.list',
+    'dir-2/file',
+    'dir-2/ignore-all/test',
+    'dir-2/ignore-non-root-dir/index',
+    'ignore-all/test',
+    'keep-empty-dir/ignore-file',
+  ]));
 });
