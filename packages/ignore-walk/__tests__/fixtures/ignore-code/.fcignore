@@ -11,5 +11,5 @@ ignore-non-root-dir
 # 忽略指定文件
 dir-2/file
 
-# 仅忽略根目录下的所有文件,但不忽略文件夹
+# TODO: 仅忽略根目录下的所有文件,但不忽略文件夹
 keep-empty-dir/**

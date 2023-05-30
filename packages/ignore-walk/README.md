@@ -1,42 +1,40 @@
 
-# 下载(@serverless-devs/downloads)
+# ignore (@serverless-devs/ignore-walk)
 
 ## 安装
 
 ```bash
-$ npm install @serverless-devs/downloads --save
+$ npm install @serverless-devs/ignore-walk --save
 ```
 
 ## 基本使用
 
 ```ts
-import downloads from '@serverless-devs/downloads';
+import ignoreWalk from '@serverless-devs/ignore-walk';
 
-downloads('https://registry.devsapp.cn/simple/devsapp/core/zipball/0.1.54')
+const zipFiles = ignoreWalk.sync({
+  ignoreFiles: ['.fcignore'],
+  path: path.join(__dirname, 'code'),
+  includeEmpty: true,
+});
 ```
 
 ## 参数解析
 
 ```ts
-import downloads from '@serverless-devs/downloads';
-downloads(url, options)
-```
+import ignoreWalk from '@serverless-devs/ignore-walk';
 
-| 参数    | 说明            | 类型    | 必填 | 默认值 |
-| ------- | --------------- | ------- | ---- | ------ |
-| url | 下载地址 | string       | 是   |        |
-| options | 方法入参 | Options | 否   |        |
+const result = ignoreWalk.sync(Options);
+```
 
 ## Options
 
 | 参数      | 说明         | 类型                          | 必填 | 默认值        |
 | --------- | ------------ | ----------------------------- | ---- | ------------- |
-| ...[DecompressOptions](https://github.com/kevva/decompress#options)  |  |      |    |   |
-| dest | 文件保存路径 | string | 否   |        |
-| logger | 输出日志 | Function | 否   |   console     |
-| extract  | 文件是否解压 | boolean                     | 否   |  false |
-| filename | 文件保存的名称  | string                       | 否   |         demo.zip      |
-| strip    | 解压文件时的提取层级   |  number     | 否   |      0         |
-
+| path  | 计算代码包的根目录 |   string   |  否  |  process.cwd() |
+| ignoreFiles | ignore 文件名列表 | string[] | 否   |    ['.signore']    |
+| includeEmpty | 包含空白目录 | boolean | 否   |   false     |
+| follow  | 保留符号链接目录 | boolean   | 否   |  false |
+| isSymbolicLink  | 如果 path 是符号链接，则设置为true，无论follow是否为true | boolean   | 否   |  - |
 
 

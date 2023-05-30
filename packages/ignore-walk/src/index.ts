@@ -156,7 +156,6 @@ class Walker extends EE {
 
       return (passFile || passDir) ? [entry, passFile, passDir] : false;
     }).filter(e => e);
-    // console.log(filtered);
 
     // now we stat them all
     // if it's a dir, and passes as a dir, then recurse
@@ -264,21 +263,9 @@ class Walker extends EE {
               (!!partial && rule.negate && (
                 rule.match('/' + entry, true) ||
                 rule.match(entry, true)));
-            
-            // let match = rule.match('/' + entry) || rule.match(entry);
-            // if (!match && !!partial) {
-            //   match = match || rule.match('/' + entry + '/') || rule.match(entry + '/');
-            //   if (!match && rule.negate) {
-            //     match = match || rule.match('/' + entry + '/') || rule.match(entry + '/');
-            //   }
-            // }
 
             if (match) {
               included = rule.negate;
-              // if (!included && rule.pattern.endsWith('/**')) {
-              //   included = !(rule.match('/' + entry) || rule.match(entry));
-              //   console.log('included: ', included, entry);
-              // }
             }
           }
         })
