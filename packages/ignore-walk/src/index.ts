@@ -4,7 +4,7 @@
 import * as fs from 'fs';
 import path from 'path';
 import { EventEmitter as EE } from 'events';
-import { Minimatch, minimatch } from 'minimatch';
+import { Minimatch } from 'minimatch';
 import { IOptions } from './types';
 
 class Walker extends EE {
