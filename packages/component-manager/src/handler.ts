@@ -47,8 +47,8 @@ export async function handlerHelp(
     }
   });
 
-  const { data } = minimist(args, opts);
-  return { help, argsData: data };
+  const parsedArgs = minimist(args, opts);
+  return { help, argsData: parsedArgs };
 }
 
 export async function handlerCommonFunction(

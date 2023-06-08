@@ -1,4 +1,4 @@
-import { cloneDeep, defaults, get, isEmpty, isNil, set } from 'lodash';
+import { cloneDeep, defaults, get, isEmpty, isNil, set, unset } from 'lodash';
 import minimist from 'minimist';
 import { DEFAULT_COMMAND_CONFIG } from "./constants";
 import { IOptions } from "./types";
@@ -20,7 +20,6 @@ export default class ComponentManager {
     // 获取子指令
     const parsedArgs = minimist(args, {});
     const argsCommand = get(parsedArgs, '_', []);
-    const parsedData = get(parsedArgs, 'data');
     // 根据指令获取配置
     const commandPath = argsCommand.join('.subCommands.');
     const commandConfig = get(commands, commandPath);
@@ -29,17 +28,17 @@ export default class ComponentManager {
       throw new Error(`没有找到对应的指令`);
     }
   
-    const result = {};
+    const result = { argsCommand };
     // 根据 help 处理参数，并得出需要显示的
     const commandHelp = get(commandConfig, 'help');
-    const { help, argsData } = await handlerHelp(commandHelp, cloneDeep(props), args, parsedData);
+    const { help, argsData } = await handlerHelp(commandHelp, cloneDeep(props), args, parsedArgs);
     set(result, 'help', help);
     set(result, 'argsData', argsData);
     // 处理支持的字段
     for (const needHandlerKey of ['parallel', 'hangRun', 'singleton']) {
       const needHandlerConfig = get(commandConfig, needHandlerKey);
       if (!isNil(needHandlerConfig)) {
-        const handlerResult = handlerCommonFunction(needHandlerConfig, cloneDeep(props), cloneDeep(argsData));
+        const handlerResult = await handlerCommonFunction(needHandlerConfig, cloneDeep(props), cloneDeep(argsData));
         set(result, needHandlerKey, handlerResult);
       }
     }

@@ -1,7 +1,7 @@
 const commands = {
   deploy: {
     help: {
-      description: 'Deploy local resources online',
+      description: 'fc deploy',
       document: 'https://serverless.help/t/fc-deploy',
       usage: ['$ s deploy <options>', '$ s deploy <sub-command> <options>'],
       options: [
@@ -22,7 +22,7 @@ const commands = {
     subCommands: {
       service: {
         help: {
-          description: 'Deploy local resources online',
+          description: 'fc deploy service',
           document: 'https://serverless.help/t/fc-deploy',
           usage: ['$ s deploy service <options>'],
           options: [
