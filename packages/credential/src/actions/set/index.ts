@@ -1,6 +1,6 @@
 import { each, keys, set, intersection, get, isEmpty, merge, hasIn, isNil, isNumber } from "lodash";
 import Core from '@alicloud/pop-core';
-import { parseArgv, writeData } from "../../utils";
+import { getYamlContent, parseArgv, writeData } from "../../utils";
 import { PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
 import { ICredentials } from "./type";
 import * as inquirer from "./inquirer";
@@ -68,7 +68,20 @@ class SetCredential {
       await this.setAccountId(argvData, credInformation);
     }
 
-    await writeData(aliasName as string, credInformation);
+    const content = await getYamlContent();
+
+    // 加密字段
+    const info = {};
+    Object.keys(credInformation).forEach((key: string) => {
+      const value = String(get(credInformation, key));
+      const cipherText = require('crypto-js').AES.encrypt(value, 'SecretKey123');
+      set(info, key, cipherText.toString());
+    });
+  
+    merge(content, { [aliasName as string]: info });
+    
+    await writeData(content);
+    return credInformation;
   }
 
   // 先判断用户指定的参数，如果指定参数是 number 类型，则先转为 string 类型

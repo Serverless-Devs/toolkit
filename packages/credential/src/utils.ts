@@ -1,14 +1,12 @@
 import minimist from 'minimist';
 import path from 'path';
 import fs from 'fs-extra';
-import { get, defaultsDeep, set, isEmpty, merge } from 'lodash';
+import { defaultsDeep, isEmpty } from 'lodash';
 import yaml from 'js-yaml';
 // @ts-ignore
 import { getRootHome } from '@serverless-devs/utils';
 import { ALIAS_DEFAULT_NAME } from './constant';
 import { ICredentials } from './actions/set/type';
-
-const Crypto = require('crypto-js');
 
 const DEFAULT_OPTS = {
   alias: {
@@ -98,18 +96,7 @@ export async function getAliasDefault(content?: Record<string, any>) {
   return `${ALIAS_DEFAULT_NAME}-${max + 1}`;
 }
 
-export async function writeData(aliasName: string, credentials: ICredentials) {
-  const content = await getYamlContent();
-
-  // 加密字段
-  const info = {};
-  Object.keys(credentials).forEach((key: string) => {
-    const value = String(get(credentials, key));
-    const cipherText = Crypto.AES.encrypt(value, 'SecretKey123');
-    set(info, key, cipherText.toString());
-  });
-  merge(content, { [aliasName]: info });
-
+export async function writeData(content: Record<string, ICredentials>) {
   try {
     fs.ensureDirSync(getRootHome());
     fs.writeFileSync(getYamlPath(), yaml.dump(content));

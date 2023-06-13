@@ -1,15 +1,14 @@
-import SetCredential from './actions/set'
+import setCredential from './actions/set'
+import removeCredential from './actions/remove'
 
 export default class Credential {
   static async get() {
 
   }
 
-  static set = SetCredential;
+  static set = setCredential;
 
-  static async remove() {
-    
-  }
+  static remove = removeCredential;
 
   static async rename() {
     
