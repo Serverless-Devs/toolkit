@@ -1,7 +1,7 @@
 import { each, keys, set, intersection, get, isEmpty, merge, hasIn, isNil, isNumber } from "lodash";
 import Core from '@alicloud/pop-core';
 import { getYamlContent, parseArgv, writeData } from "../../utils";
-import { PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
+import { CRYPTO_STRING, PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
 import { ICredentials } from "./type";
 import * as inquirer from "./inquirer";
 
@@ -74,7 +74,7 @@ class SetCredential {
     const info = {};
     Object.keys(credInformation).forEach((key: string) => {
       const value = String(get(credInformation, key));
-      const cipherText = require('crypto-js').AES.encrypt(value, 'SecretKey123');
+      const cipherText = require('crypto-js').AES.encrypt(value, CRYPTO_STRING);
       set(info, key, cipherText.toString());
     });
   
