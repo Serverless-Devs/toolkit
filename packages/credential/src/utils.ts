@@ -6,7 +6,6 @@ import yaml from 'js-yaml';
 // @ts-ignore
 import { getRootHome } from '@serverless-devs/utils';
 import { ALIAS_DEFAULT_NAME } from './constant';
-import { ICredentials } from './actions/set/type';
 
 const DEFAULT_OPTS = {
   alias: {
@@ -98,7 +97,7 @@ export async function getAliasDefault(content?: Record<string, any>) {
   return `${ALIAS_DEFAULT_NAME}-${max + 1}`;
 }
 
-export async function writeData(content: Record<string, ICredentials>) {
+export async function writeData(content: Record<string, Record<string, string>>) {
   try {
     fs.ensureDirSync(getRootHome());
     fs.writeFileSync(getYamlPath(), yaml.dump(content));

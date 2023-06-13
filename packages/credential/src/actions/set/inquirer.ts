@@ -1,7 +1,6 @@
 import inquirer from 'inquirer';
 import { PROVIDER_LIST, PROVIDER_CREDENTIAL_KEYS, PROVIDER, PROVIDER_DOCS } from '../../constant';
 import { get, set, merge, hasIn, isNil, trim, transform } from 'lodash';
-import { ICredentials } from './type';
 import { getAliasDefault, getYamlContent, validateInput } from '../../utils';
 
 async function addCustom(info: Record<string, string>) {
@@ -42,7 +41,7 @@ async function addCustom(info: Record<string, string>) {
  * 密钥设置处理
  * @returns 
  */
-export async function inputCredentials (): Promise<ICredentials> {
+export async function inputCredentials (): Promise<Record<string, string>> {
   const { provider } = await inquirer.prompt(PROVIDER_LIST);
 
   const docs = get(PROVIDER_DOCS, provider);
@@ -50,7 +49,7 @@ export async function inputCredentials (): Promise<ICredentials> {
     console.log(`🧭 Refer to the document for ${provider} key: ${docs}`);
   }
 
-  const credentials: ICredentials = { __provider: provider };
+  const credentials = { __provider: provider };
   if (provider === PROVIDER['custom']) {
     await addCustom(credentials as Record<string, string>);
   } else {

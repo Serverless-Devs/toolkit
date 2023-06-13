@@ -2,8 +2,9 @@ import { each, keys, set, intersection, get, isEmpty, merge, hasIn, isNil, isNum
 import Core from '@alicloud/pop-core';
 import { getYamlContent, parseArgv, writeData } from "../../utils";
 import { CRYPTO_STRING, PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
-import { ICredentials } from "./type";
 import * as inquirer from "./inquirer";
+
+const Crypto = require('crypto-js');
 
 class SetCredential {
   static async getAccountId(credInformation: any){
@@ -24,7 +25,7 @@ class SetCredential {
       );
       const accountId = get(result, 'AccountId');
       if (isNil(accountId)) {
-        throw new Error(`The obtained accoundId is abnormal, RequestId is ${result.RequestId}`);
+        throw new Error(`The obtained accountId is abnormal, RequestId is ${result.RequestId}`);
       }
       return accountId;
     } catch (ex: any) {
@@ -33,7 +34,7 @@ class SetCredential {
     }
   }
 
-  static isAlibaba(credInformation: ICredentials): boolean {
+  static isAlibaba(credInformation: Record<string, string>): boolean {
     if (credInformation?.__provider === PROVIDER.alibaba) {
       return true;
     }
@@ -74,7 +75,7 @@ class SetCredential {
     const info = {};
     Object.keys(credInformation).forEach((key: string) => {
       const value = String(get(credInformation, key));
-      const cipherText = require('crypto-js').AES.encrypt(value, CRYPTO_STRING);
+      const cipherText = Crypto.AES.encrypt(value, CRYPTO_STRING);
       set(info, key, cipherText.toString());
     });
   
@@ -88,7 +89,7 @@ class SetCredential {
   // 通过 ak、sk 获取 uid
   //   如果获取到了 uid 并且用户指定了 uid，则先对比一下。使用通过接口获取到的 uid
   //   如果没有获取 uid，如果没有传入 uid，抛出异常。如果传入了 uid，使用传入的
-  private async setAccountId(argvData: Record<string, string>, credInformation: ICredentials) {
+  private async setAccountId(argvData: Record<string, string>, credInformation: Record<string, string>) {
     let uid = argvData.AccountID;
     if (isNumber(uid)) {
       uid = `${uid}`;
@@ -108,7 +109,7 @@ class SetCredential {
     }
   }
 
-  private handlerArgv(): { credInformation: ICredentials; argvData: Record<string, any> } {
+  private handlerArgv(): { credInformation: Record<string, string>; argvData: Record<string, any> } {
     const argvData = parseArgv();
 
     const argvKeys = keys(argvData); 
