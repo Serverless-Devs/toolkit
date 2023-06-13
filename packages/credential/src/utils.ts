@@ -1,7 +1,7 @@
 import minimist from 'minimist';
 import path from 'path';
 import fs from 'fs-extra';
-import { defaultsDeep, isEmpty } from 'lodash';
+import { defaultsDeep, isEmpty, trim } from 'lodash';
 import yaml from 'js-yaml';
 // @ts-ignore
 import { getRootHome } from '@serverless-devs/utils';
@@ -17,6 +17,8 @@ const DEFAULT_OPTS = {
   boolean: ['help', 'force'],
   string: ['access'],
 }
+
+export const validateInput = (input: string) => isEmpty(trim(input)) ? 'Cannot be empty' : true 
 
 /**
  * 解析参数

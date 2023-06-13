@@ -22,7 +22,7 @@ export default async () => {
       {
         type: 'list',
         name: 'aliasName',
-        message: 'Alias already exists. Please select a type:',
+        message: 'Please select need remove alias:',
         choices: aliasNames.map((alias: string) => ({
           name: alias, value: alias
         })),

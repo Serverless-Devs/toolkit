@@ -1,8 +1,8 @@
 import inquirer from 'inquirer';
 import { PROVIDER_LIST, PROVIDER_CREDENTIAL_KEYS, PROVIDER, PROVIDER_DOCS } from '../../constant';
-import { get, set, isEmpty, merge, hasIn, isNil } from 'lodash';
+import { get, set, merge, hasIn, isNil, trim, transform } from 'lodash';
 import { ICredentials } from './type';
-import { getAliasDefault, getYamlContent } from '../../utils';
+import { getAliasDefault, getYamlContent, validateInput } from '../../utils';
 
 async function addCustom(info: Record<string, string>) {
   const { type } = await inquirer.prompt([
@@ -23,17 +23,17 @@ async function addCustom(info: Record<string, string>) {
         type: 'input',
         message: 'Please enter key: ',
         name: 'key',
-        validate: (input: string) => isEmpty(input) ? 'Cannot be empty' : true,
+        validate: validateInput,
       },
       {
         type: 'input',
         message: 'Please enter value: ',
         name: 'value',
-        validate: (input: string) => isEmpty(input) ? 'Cannot be empty' : true,
+        validate: validateInput,
       },
     ]);
 
-    set(info, key, value)
+    set(info, trim(key), trim(value))
     await addCustom(info);
   }
 }
@@ -59,10 +59,13 @@ export async function inputCredentials (): Promise<ICredentials> {
       type: 'input',
       message: `${key}: `,
       name: key,
-      validate: (input: string) => isEmpty(input) ? 'Cannot be empty' : true,
+      validate: validateInput,
     }));
     const result = await inquirer.prompt(promptList);
-    merge(credentials, result);
+    const trimResult = transform(result, (result: any, value: string, key: string) => {
+      result[key] = trim(value)
+    })
+    merge(credentials, trimResult);
   }
 
   return credentials;
@@ -74,7 +77,7 @@ export async function inputCredentials (): Promise<ICredentials> {
  */
 export async function getAlias(options: { access?: string; force?: boolean }): Promise<string | boolean> {
   const { access, force } = options || {};
-  let a;
+  let a = access;
 
   if (isNil(access)) {
     const { aliasName } = await inquirer.prompt([
@@ -85,12 +88,12 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
         default: await getAliasDefault(),
       }
     ]);
-    a = aliasName;
+    a = trim(aliasName);
   }
 
   // 如果判断存在命名冲突
   const content = getYamlContent();
-  if (hasIn(content, a) && force !== true) {
+  if (hasIn(content, a as string) && force !== true) {
     const { type } = await inquirer.prompt([
       {
         type: 'list',
@@ -111,5 +114,6 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
     }
   }
 
-  return a;
+  return a as string;
 }
+

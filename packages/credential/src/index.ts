@@ -1,4 +1,5 @@
 import setCredential from './actions/set'
+import renameCredential from './actions/rename'
 import removeCredential from './actions/remove'
 
 export default class Credential {
@@ -10,9 +11,7 @@ export default class Credential {
 
   static remove = removeCredential;
 
-  static async rename() {
-    
-  }
+  static rename = renameCredential;
 
   static async decrypt() {
     
