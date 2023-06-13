@@ -3,40 +3,10 @@ import path from 'path';
 import fs from 'fs-extra';
 import { defaultsDeep, isEmpty, trim } from 'lodash';
 import yaml from 'js-yaml';
-// @ts-ignore
 import { getRootHome } from '@serverless-devs/utils';
-import { ALIAS_DEFAULT_NAME } from './constant';
-
-const DEFAULT_OPTS = {
-  alias: {
-    access: 'a',
-    help: 'h',
-    force: 'f',
-  },
-  boolean: ['help', 'force'],
-  string: ['access'],
-}
+import { ALIAS_DEFAULT_NAME } from '../constant';
 
 export const validateInput = (input: string) => isEmpty(trim(input)) ? 'Cannot be empty' : true 
-
-/**
- * 解析参数
- * @param opts 
- * @returns 
- */
-export function parseArgv(opts?: minimist.Opts): Record<string, any> {
-  // 需要考虑两个 case
-  //   1. 包含空格: -e '{ "setCredential": "value" }'
-  //   2. -la => l + a
-  //   2. --la => la
-  const argv = process.argv.splice(2);
-
-  if (isEmpty(argv)) {
-    return { _: [] };
-  }
-
-  return minimist(argv, defaultsDeep(opts, DEFAULT_OPTS));
-}
 
 /**
  * 获取 yaml 文件路径
@@ -59,12 +29,12 @@ export function getYamlPath(): string {
  * 获取密钥文件的内容
  * @returns 
  */
-export function getYamlContent(): Record<string, any> {
+export function getYamlContent(): Record<string, Record<string, string>> {
   const fileYamlPath = getYamlPath();
 
   if (fs.existsSync(fileYamlPath)) {
     const content = fs.readFileSync(fileYamlPath, 'utf8');
-    return yaml.load(content) as any;
+    return yaml.load(content) as Record<string, Record<string, string>>;
   }
 
   return {};
@@ -74,7 +44,7 @@ export function getYamlContent(): Record<string, any> {
  * 获取设置密钥默认名称
  * @returns 
  */
-export async function getAliasDefault(content?: Record<string, any>) {
+export async function getAliasDefault(content?: Record<string, Record<string, string>>) {
   if (isEmpty(content)) {
     return ALIAS_DEFAULT_NAME;
   }

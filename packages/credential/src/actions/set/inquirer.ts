@@ -61,7 +61,7 @@ export async function inputCredentials (): Promise<Record<string, string>> {
       validate: validateInput,
     }));
     const result = await inquirer.prompt(promptList);
-    const trimResult = transform(result, (result: any, value: string, key: string) => {
+    const trimResult = transform(result, (result: Record<string, string>, value: string, key: string) => {
       result[key] = trim(value)
     })
     merge(credentials, trimResult);

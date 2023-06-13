@@ -1,15 +1,11 @@
 import inquirer from "inquirer";
-import { getYamlContent, parseArgv, writeData } from "../utils";
+import { getYamlContent, writeData } from "../utils";
 import { hasIn, transform, set } from "lodash";
 import { CRYPTO_STRING } from "../constant";
 
 const Crypto = require('crypto-js');
 
-export default async () => {
-  const { access, help } = parseArgv();
-
-  if (help) { return }
-
+export default async (access?: string) => {
   const content = await getYamlContent();
 
   let alias = access;

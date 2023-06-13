@@ -1,22 +1,13 @@
 import inquirer from "inquirer";
-import { getYamlContent, parseArgv, validateInput, writeData } from "../utils";
+import { getYamlContent, validateInput, writeData } from "../utils";
 import { hasIn, unset, set, trim } from "lodash";
+import { IRenameOptions } from "../types";
 
 
-export default async () => {
-  const { source, target, help } = parseArgv({
-    alias: {
-      source: 's',
-      target: 't',
-    },
-    string: ['source', 'target'],
-  });
-
-  if (help) { return }
-
+export default async ({ source, target }: IRenameOptions) => {
   const content = await getYamlContent();
 
-  let sourceName = source;
+  let sourceName = source as string;
   if (source) {
     if (!hasIn(content, source)) {
       console.error(`Not found source alias name: ${source}`);
@@ -38,7 +29,7 @@ export default async () => {
     sourceName = aliasName;
   }
 
-  let targetName = target;
+  let targetName = target as string;
   if (!target) {
     const { aliasName } = await inquirer.prompt([
       {

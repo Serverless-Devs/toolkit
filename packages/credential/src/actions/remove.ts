@@ -1,12 +1,8 @@
 import inquirer from "inquirer";
-import { getYamlContent, parseArgv, writeData } from "../utils";
+import { getYamlContent, writeData } from "../utils";
 import { hasIn, unset } from "lodash";
 
-export default async () => {
-  const { access, help } = parseArgv();
-
-  if (help) { return }
-
+export default async (access?: string) => {
   const content = await getYamlContent();
 
   if (access) {

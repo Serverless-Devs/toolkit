@@ -5,8 +5,12 @@ import decryptCredential from './actions/decrypt'
 import defaultCredential from './actions/default'
 
 export default class Credential {
-  static async get() {
-
+  static async get(access?: string) {
+    // 优先级处理: 环境变量、access.yaml
+    // 如果 access 不存在
+    /**
+     * yaml
+     */
   }
 
   static set = setCredential;
