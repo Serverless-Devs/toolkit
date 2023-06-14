@@ -98,7 +98,7 @@ class SetCredential {
         })
         return { argvData, credInformation };
       } else {
-        throw new Error('Please make sure -kl/--keyList is as long as -il/--infoList');
+        throw new Error('Please make sure --kl/--keyList is as long as --il/--infoList');
       }
     }
 

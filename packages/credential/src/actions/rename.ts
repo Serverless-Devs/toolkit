@@ -1,7 +1,11 @@
 import inquirer from "inquirer";
 import { getYamlContent, validateInput, writeData } from "../utils";
 import { hasIn, unset, set, trim } from "lodash";
-import { IRenameOptions } from "../types";
+
+export interface IRenameOptions {
+  source?: string;
+  target?: string;
+}
 
 
 export default async ({ source, target }: IRenameOptions) => {
