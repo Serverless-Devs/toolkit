@@ -45,3 +45,5 @@ export const PROVIDER_CREDENTIAL_KEYS = {
 }
 
 export const CRYPTO_STRING = 'SecretKey123';
+
+export const ALIBABA_ENDS_WITH_KEY = '_serverless_devs_key';
