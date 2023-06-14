@@ -1,7 +1,12 @@
 import { get, hasIn, isNil } from "lodash";
 import Core from '@alicloud/pop-core';
 import { PROVIDER } from "../constant";
-import { IAliCredential } from "../types";
+
+export interface IAliCredential {
+  AccessKeyID: string;
+  AccessKeySecret: string;
+  SecurityToken?: string;
+}
 
 export default class Alibaba {
   static async getAccountId(credInformation: IAliCredential): Promise<string> {

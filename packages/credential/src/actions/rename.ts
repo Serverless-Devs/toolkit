@@ -1,5 +1,4 @@
-import { prompt } from "../utils/inquirer";
-import { getYamlContent, validateInput, writeData } from "../utils";
+import { prompt, getYamlContent, validateInput, writeData } from "../utils";
 import { hasIn, unset, set, trim } from "lodash";
 
 export interface IRenameOptions {

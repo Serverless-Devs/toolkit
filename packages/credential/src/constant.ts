@@ -1,3 +1,4 @@
+// 支持厂商密钥
 export enum PROVIDER {
   alibaba = 'Alibaba Cloud',
   baidu = 'Baidu Cloud',
@@ -9,6 +10,19 @@ export enum PROVIDER {
   custom = 'Custom',
 }
 
+// 选择厂商
+export const PROVIDER_LIST = [
+  { name: 'Alibaba Cloud (alibaba)', value: PROVIDER.alibaba },
+  { name: 'AWS (aws)', value: PROVIDER.aws },
+  { name: 'Azure (azure)', value: PROVIDER.azure },
+  { name: 'Baidu Cloud (baidu)', value: PROVIDER.baidu },
+  { name: 'Google Cloud (google)', value: PROVIDER.google },
+  { name: 'Huawei Cloud (huawei)', value: PROVIDER.huawei },
+  { name: 'Tencent Cloud (tencent)', value: PROVIDER.tencent },
+  { name: 'Custom (others)', value: PROVIDER.custom },
+];
+
+// 厂商密钥获取文档
 export const PROVIDER_DOCS = {
   [PROVIDER.alibaba]: 'http://config.devsapp.net/account/alibaba',
   [PROVIDER.aws]: 'http://config.devsapp.net/account/aws',
@@ -19,6 +33,7 @@ export const PROVIDER_DOCS = {
   [PROVIDER.tencent]: 'http://config.devsapp.net/account/tencent',
 };
 
+// 厂商密钥Key列表
 export const PROVIDER_CREDENTIAL_KEYS = {
   [PROVIDER.alibaba]: ['AccessKeyID', 'AccessKeySecret'], // AccountID
   [PROVIDER.aws]: ['AccessKeyID', 'SecretAccessKey'],
@@ -29,26 +44,4 @@ export const PROVIDER_CREDENTIAL_KEYS = {
   [PROVIDER.tencent]: ['AccountID', 'SecretID', 'SecretKey'],
 }
 
-export const PROVIDER_LIST = [
-  {
-    type: 'list',
-    name: 'provider',
-    message: 'Please select a provider:',
-    choices: [
-      { name: 'Alibaba Cloud (alibaba)', value: PROVIDER.alibaba },
-      { name: 'AWS (aws)', value: PROVIDER.aws },
-      { name: 'Azure (azure)', value: PROVIDER.azure },
-      { name: 'Baidu Cloud (baidu)', value: PROVIDER.baidu },
-      { name: 'Google Cloud (google)', value: PROVIDER.google },
-      { name: 'Huawei Cloud (huawei)', value: PROVIDER.huawei },
-      { name: 'Tencent Cloud (tencent)', value: PROVIDER.tencent },
-      { name: 'Custom (others)', value: PROVIDER.custom },
-    ],
-  }
-];
-
-export const ALIAS_DEFAULT_NAME = 'default';
-
 export const CRYPTO_STRING = 'SecretKey123';
-
-export const DEFAULT_PROMPT_MESSAGE = 'Interaction in cicd environment, throwing exception';

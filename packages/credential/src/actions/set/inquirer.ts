@@ -1,7 +1,6 @@
-import { prompt } from '../../utils/inquirer';
 import { PROVIDER_LIST, PROVIDER_CREDENTIAL_KEYS, PROVIDER, PROVIDER_DOCS } from '../../constant';
 import { get, set, merge, hasIn, isNil, trim, transform } from 'lodash';
-import { getAliasDefault, getYamlContent, validateInput } from '../../utils';
+import { prompt, getAliasDefault, getYamlContent, validateInput } from '../../utils';
 
 async function addCustom(info: Record<string, string>) {
   const { type } = await prompt([
@@ -42,7 +41,14 @@ async function addCustom(info: Record<string, string>) {
  * @returns 
  */
 export async function inputCredentials (): Promise<Record<string, string>> {
-  const { provider } = await prompt(PROVIDER_LIST);
+  const { provider } = await prompt([
+    {
+      type: 'list',
+      name: 'provider',
+      message: 'Please select a provider:',
+      choices: PROVIDER_LIST,
+    }
+  ]);
 
   const docs = get(PROVIDER_DOCS, provider);
   if (docs) {

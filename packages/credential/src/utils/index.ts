@@ -3,7 +3,9 @@ import fs from 'fs-extra';
 import { isEmpty, trim } from 'lodash';
 import yaml from 'js-yaml';
 import { getRootHome } from '@serverless-devs/utils';
-import { ALIAS_DEFAULT_NAME } from '../constant';
+
+export { default as Alibaba, IAliCredential } from './alibaba';
+export { prompt } from './inquirer';
 
 export const validateInput = (input: string) => isEmpty(trim(input)) ? 'Cannot be empty' : true 
 
@@ -44,13 +46,15 @@ export function getYamlContent(): Record<string, Record<string, string>> {
  * @returns 
  */
 export async function getAliasDefault(content?: Record<string, Record<string, string>>) {
+  const defaultName = 'default';
+
   if (isEmpty(content)) {
-    return ALIAS_DEFAULT_NAME;
+    return defaultName;
   }
 
-  const keys = Object.keys(content).filter((item) => item.startsWith(ALIAS_DEFAULT_NAME))
+  const keys = Object.keys(content).filter((item) => item.startsWith(defaultName))
   if (keys.length === 0) {
-    return ALIAS_DEFAULT_NAME;
+    return defaultName;
   }
 
   let max = 0;
@@ -63,7 +67,7 @@ export async function getAliasDefault(content?: Record<string, Record<string, st
     }
   });
 
-  return `${ALIAS_DEFAULT_NAME}-${max + 1}`;
+  return `${defaultName}-${max + 1}`;
 }
 
 export async function writeData(content: Record<string, Record<string, string>>) {

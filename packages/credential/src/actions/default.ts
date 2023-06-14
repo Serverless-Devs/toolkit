@@ -1,6 +1,5 @@
 import { hasIn, transform, set } from "lodash";
-import { prompt } from '../utils/inquirer';
-import { getYamlContent, writeData } from "../utils";
+import { prompt, getYamlContent, writeData } from "../utils";
 import { CRYPTO_STRING } from "../constant";
 
 const Crypto = require('crypto-js');

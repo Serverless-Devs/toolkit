@@ -1,9 +1,7 @@
 import { each, keys, set, intersection, get, isEmpty, merge, isNumber, cloneDeep } from "lodash";
-import { getYamlContent, writeData } from "../../utils";
+import { getYamlContent, writeData, Alibaba, IAliCredential } from "../../utils";
 import { CRYPTO_STRING, PROVIDER, PROVIDER_CREDENTIAL_KEYS } from "../../constant";
 import * as inquirer from "./inquirer";
-import Alibaba from "../../utils/alibaba";
-import { IAliCredential } from "../../types";
 
 const Crypto = require('crypto-js');
 

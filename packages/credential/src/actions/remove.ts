@@ -1,5 +1,4 @@
-import { prompt } from "../utils/inquirer";
-import { getYamlContent, writeData } from "../utils";
+import { prompt, getYamlContent, writeData } from "../utils";
 import { hasIn, unset } from "lodash";
 
 export default async (access?: string) => {
