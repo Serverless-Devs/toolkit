@@ -1,5 +1,5 @@
 import { each, endsWith, assign, set, transform } from "lodash"
-import { ALIBABA_ENDS_WITH_KEY } from "../constant";
+import { ENDS_WITH_KEY_DEVS_KEY } from "../constant";
 import { getYamlContent } from "../utils";
 import decryptCredential from './decrypt';
 
@@ -8,11 +8,11 @@ type IAccessList = Record<string, Record<string, string>>;
 /**
  * 通过环境变量获取密钥
  */
-const getEnvironment = (): IAccessList => {
+export const getEnvironment = (): IAccessList => {
   const result: IAccessList = {};
 
   each(process.env, (value: unknown, key: string) => {
-    if (endsWith(key, ALIBABA_ENDS_WITH_KEY)) {
+    if (endsWith(key, ENDS_WITH_KEY_DEVS_KEY)) {
       try {
         set(result, key, JSON.parse(value as string));
       } catch (ex: any) {
@@ -27,7 +27,7 @@ const getEnvironment = (): IAccessList => {
 /**
  * 通过 access.yaml 获取配置文件
  */
-const getAccessFile = () => {
+export const getAccessFile = () => {
   const yamlResult: IAccessList = getYamlContent();
 
   transform(yamlResult, (result: IAccessList, value, key) => {

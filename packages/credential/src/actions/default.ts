@@ -1,8 +1,6 @@
 import { hasIn, transform, set } from "lodash";
 import { prompt, getYamlContent, writeData } from "../utils";
-import { CRYPTO_STRING } from "../constant";
-
-const Crypto = require('crypto-js');
+import { CRYPTO_TRUE, CRYPTO_FALSE } from "../constant";
 
 export default async (access?: string) => {
   const content = await getYamlContent();
@@ -27,18 +25,15 @@ export default async (access?: string) => {
       },
     ]);
     alias = aliasName;
-  }
-
-  const trueStr = Crypto.AES.encrypt('true', CRYPTO_STRING);
-  const falseStr = Crypto.AES.encrypt('falseStr', CRYPTO_STRING);
+  };
 
   transform(content, (result: Record<string, Record<string, string>>, value, key) => {
-    if (value.__default === trueStr) {
-      value.__default = falseStr;
+    if (value.__default === CRYPTO_TRUE) {
+      value.__default = CRYPTO_FALSE;
     }
     set(result, key, value);
   })
 
-  set(content, `${alias}.__default`, trueStr);
+  set(content, `${alias}.__default`, CRYPTO_TRUE);
   await writeData(content);
 }

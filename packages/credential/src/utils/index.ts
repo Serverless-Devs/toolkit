@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import { isEmpty, trim } from 'lodash';
 import yaml from 'js-yaml';
 import { getRootHome } from '@serverless-devs/utils';
+import { DEFAULT_NAME } from '../constant';
 
 export { default as Alibaba, IAliCredential } from './alibaba';
 export { prompt } from './inquirer';
@@ -46,15 +47,13 @@ export function getYamlContent(): Record<string, Record<string, string>> {
  * @returns 
  */
 export async function getAliasDefault(content?: Record<string, Record<string, string>>) {
-  const defaultName = 'default';
-
   if (isEmpty(content)) {
-    return defaultName;
+    return DEFAULT_NAME;
   }
 
-  const keys = Object.keys(content).filter((item) => item.startsWith(defaultName))
+  const keys = Object.keys(content).filter((item) => item.startsWith(DEFAULT_NAME))
   if (keys.length === 0) {
-    return defaultName;
+    return DEFAULT_NAME;
   }
 
   let max = 0;
@@ -67,7 +66,7 @@ export async function getAliasDefault(content?: Record<string, Record<string, st
     }
   });
 
-  return `${defaultName}-${max + 1}`;
+  return `${DEFAULT_NAME}-${max + 1}`;
 }
 
 export async function writeData(content: Record<string, Record<string, string>>) {

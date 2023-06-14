@@ -6,7 +6,6 @@ export interface IRenameOptions {
   target?: string;
 }
 
-
 export default async ({ source, target }: IRenameOptions) => {
   const content = await getYamlContent();
 

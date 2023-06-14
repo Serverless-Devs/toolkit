@@ -5,10 +5,20 @@ import * as inquirer from "./inquirer";
 
 const Crypto = require('crypto-js');
 
-class SetCredential {
-  async run(options: Record<string, any>): Promise<undefined | Record<string, string>>{
-    const { argvData, credInformation } = this.handlerArgv(options);
-    const { access, force } = argvData;
+export interface IOptions {
+  access: string;
+  force: boolean;
+}
+
+export type IResult = {
+  access: string;
+  credential: Record<string, string>;
+}
+
+export default class SetCredential {
+  async run(options: Record<string, any>): Promise<IResult | undefined>{
+    const { access, force } = options;
+    const credInformation = this.handlerArgv(options);
 
     // 没有通过参数指定，交互式设置
     if (isEmpty(credInformation)) {
@@ -21,10 +31,10 @@ class SetCredential {
 
     // 如果是 ali 密钥则手动添加设置一些可获取密钥
     if (Alibaba.isAlibaba(credInformation)) {
-      if (argvData.SecurityToken) {
-        set(credInformation, 'SecurityToken', argvData.SecurityToken);
+      if (options.SecurityToken) {
+        set(credInformation, 'SecurityToken', options.SecurityToken);
       }
-      await this.setAccountId(argvData, credInformation);
+      await this.setAccountId(options, credInformation);
     }
 
     const content = await getYamlContent();
@@ -40,7 +50,10 @@ class SetCredential {
     merge(content, { [aliasName as string]: info });
 
     await writeData(content);
-    return credInformation;
+    return {
+      access: aliasName as string,
+      credential: credInformation,
+    };
   }
 
   // 先判断用户指定的参数，如果指定参数是 number 类型，则先转为 string 类型
@@ -67,7 +80,7 @@ class SetCredential {
     }
   }
 
-  private handlerArgv(argvData: Record<string, string>): { credInformation: Record<string, string>; argvData: Record<string, any> } {
+  private handlerArgv(argvData: Record<string, string>): Record<string, string> {
     const argvKeys = keys(argvData); 
     // 处理已知密钥对支持
     for (const provider in PROVIDER_CREDENTIAL_KEYS) {
@@ -77,10 +90,7 @@ class SetCredential {
         const credInformation = { __provider: provider };
         each(keys, key => set(credInformation, key, argvData[key]));
 
-        return {
-          credInformation,
-          argvData,
-        };
+        return credInformation;
       }
     }
     // 处理自定义
@@ -94,18 +104,13 @@ class SetCredential {
         each(infoKeyList, (value, index) => {
           set(credInformation, value, infoValueList[index]);
         })
-        return { argvData, credInformation };
+        return credInformation;
       } else {
         throw new Error('Please make sure --kl/--keyList is as long as --il/--infoList');
       }
     }
 
     // TODO: 多余的参数怎么警告
-    return { argvData, credInformation: {} };
+    return {};
   }
-}
-
-export default async (options: Record<string, any>) => {
-  const setCredential = new SetCredential();
-  return await setCredential.run(cloneDeep(options));
 }

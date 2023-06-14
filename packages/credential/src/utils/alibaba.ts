@@ -6,6 +6,7 @@ export interface IAliCredential {
   AccessKeyID: string;
   AccessKeySecret: string;
   SecurityToken?: string;
+  AccountID?: string;
 }
 
 export default class Alibaba {
