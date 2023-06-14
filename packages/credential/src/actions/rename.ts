@@ -1,4 +1,4 @@
-import inquirer from "inquirer";
+import { prompt } from "../utils/inquirer";
 import { getYamlContent, validateInput, writeData } from "../utils";
 import { hasIn, unset, set, trim } from "lodash";
 
@@ -20,7 +20,7 @@ export default async ({ source, target }: IRenameOptions) => {
   } else {
     const aliasNames = Object.keys(content);
     
-    const { aliasName } = await inquirer.prompt([
+    const { aliasName } = await prompt([
       {
         type: 'list',
         name: 'aliasName',
@@ -35,7 +35,7 @@ export default async ({ source, target }: IRenameOptions) => {
 
   let targetName = target as string;
   if (!target) {
-    const { aliasName } = await inquirer.prompt([
+    const { aliasName } = await prompt([
       {
         type: 'input',
         name: 'aliasName',

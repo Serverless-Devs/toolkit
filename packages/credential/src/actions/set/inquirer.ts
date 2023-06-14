@@ -1,10 +1,10 @@
-import inquirer from 'inquirer';
+import { prompt } from '../../utils/inquirer';
 import { PROVIDER_LIST, PROVIDER_CREDENTIAL_KEYS, PROVIDER, PROVIDER_DOCS } from '../../constant';
 import { get, set, merge, hasIn, isNil, trim, transform } from 'lodash';
 import { getAliasDefault, getYamlContent, validateInput } from '../../utils';
 
 async function addCustom(info: Record<string, string>) {
-  const { type } = await inquirer.prompt([
+  const { type } = await prompt([
     {
       type: 'list',
       name: 'type',
@@ -17,7 +17,7 @@ async function addCustom(info: Record<string, string>) {
   ]);
 
   if (type === 'add') {
-    const { key, value } = await inquirer.prompt([
+    const { key, value } = await prompt([
       {
         type: 'input',
         message: 'Please enter key: ',
@@ -42,7 +42,7 @@ async function addCustom(info: Record<string, string>) {
  * @returns 
  */
 export async function inputCredentials (): Promise<Record<string, string>> {
-  const { provider } = await inquirer.prompt(PROVIDER_LIST);
+  const { provider } = await prompt(PROVIDER_LIST);
 
   const docs = get(PROVIDER_DOCS, provider);
   if (docs) {
@@ -60,7 +60,7 @@ export async function inputCredentials (): Promise<Record<string, string>> {
       name: key,
       validate: validateInput,
     }));
-    const result = await inquirer.prompt(promptList);
+    const result = await prompt(promptList);
     const trimResult = transform(result, (result: Record<string, string>, value: string, key: string) => {
       result[key] = trim(value)
     })
@@ -79,7 +79,7 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
   let a = access;
 
   if (isNil(access)) {
-    const { aliasName } = await inquirer.prompt([
+    const { aliasName } = await prompt([
       {
         type: 'input',
         message: 'Please create alias for key pair. If not, please enter to skip',
@@ -93,7 +93,7 @@ export async function getAlias(options: { access?: string; force?: boolean }): P
   // 如果判断存在命名冲突
   const content = getYamlContent();
   if (hasIn(content, a as string) && force !== true) {
-    const { type } = await inquirer.prompt([
+    const { type } = await prompt([
       {
         type: 'list',
         name: 'type',

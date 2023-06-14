@@ -1,4 +1,4 @@
-import inquirer from "inquirer";
+import { prompt } from "../utils/inquirer";
 import { getYamlContent, writeData } from "../utils";
 import { hasIn, unset } from "lodash";
 
@@ -14,7 +14,7 @@ export default async (access?: string) => {
   } else {
     const aliasNames = Object.keys(content);
     
-    const { aliasName } = await inquirer.prompt([
+    const { aliasName } = await prompt([
       {
         type: 'list',
         name: 'aliasName',

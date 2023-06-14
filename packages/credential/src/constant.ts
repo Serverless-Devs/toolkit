@@ -49,5 +49,6 @@ export const PROVIDER_LIST = [
 
 export const ALIAS_DEFAULT_NAME = 'default';
 
-
 export const CRYPTO_STRING = 'SecretKey123';
+
+export const DEFAULT_PROMPT_MESSAGE = 'Interaction in cicd environment, throwing exception';

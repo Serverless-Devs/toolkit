@@ -1,6 +1,6 @@
-import inquirer from "inquirer";
-import { getYamlContent, writeData } from "../utils";
 import { hasIn, transform, set } from "lodash";
+import { prompt } from '../utils/inquirer';
+import { getYamlContent, writeData } from "../utils";
 import { CRYPTO_STRING } from "../constant";
 
 const Crypto = require('crypto-js');
@@ -17,7 +17,7 @@ export default async (access?: string) => {
   } else {
     const aliasNames = Object.keys(content);
     console.log('You can choose an access to set as the default.');
-    const { aliasName } = await inquirer.prompt([
+    const { aliasName } = await prompt([
       {
         type: 'list',
         name: 'aliasName',

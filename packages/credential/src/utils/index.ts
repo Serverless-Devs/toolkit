@@ -1,7 +1,6 @@
-import minimist from 'minimist';
 import path from 'path';
 import fs from 'fs-extra';
-import { defaultsDeep, isEmpty, trim } from 'lodash';
+import { isEmpty, trim } from 'lodash';
 import yaml from 'js-yaml';
 import { getRootHome } from '@serverless-devs/utils';
 import { ALIAS_DEFAULT_NAME } from '../constant';
