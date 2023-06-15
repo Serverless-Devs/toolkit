@@ -8,6 +8,7 @@ import Credential from '../../src';
 async function notParams () {
   const credential = new Credential();
   const result = await credential.set({
+    // @ts-ignore
     test: 'abc', // TODO: 存在错误的参数没有警告
   });
   console.log('notParams', result);

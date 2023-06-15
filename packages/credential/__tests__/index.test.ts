@@ -27,7 +27,7 @@ beforeAll(async () => {
     force: true,
     KeyVaultName: 'KeyVaultName',
     TenantID: 'TenantID',
-    ClentID: 'ClentID',
+    ClientID: 'ClientID',
     ClientSecret: 'ClientSecret',
   })
 

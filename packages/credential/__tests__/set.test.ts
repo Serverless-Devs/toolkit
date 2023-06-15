@@ -48,7 +48,8 @@ describe('Set', () => {
       force: true,
       AccessKeyID: 'AccessKeyID',
       SecretAccessKey: 'SecretAccessKey',
-      Test: 'abc'
+      // @ts-ignore
+      Test: 'abc',
     })
 
     expect(result?.access).toBe('aws');
@@ -64,7 +65,7 @@ describe('Set', () => {
       force: true,
       KeyVaultName: 'KeyVaultName',
       TenantID: 'TenantID',
-      ClentID: 'ClentID',
+      ClientID: 'ClientID',
       ClientSecret: 'ClientSecret',
     })
 
@@ -73,7 +74,7 @@ describe('Set', () => {
       credential: {
         KeyVaultName: 'KeyVaultName',
         TenantID: 'TenantID',
-        ClentID: 'ClentID',
+        ClientID: 'ClientID',
         ClientSecret: 'ClientSecret',
       },
     });
@@ -118,6 +119,7 @@ describe('Set', () => {
       force: true,
       AccessKeyID: 'AccessKeyID',
       SecretAccessKey: 'SecretAccessKey',
+      // @ts-ignore
       Test: 'abc'
     })
 
@@ -173,6 +175,7 @@ describe('Set', () => {
         access: 'custom',
         force: true,
         keyList: 'SecretID,SecretKey,Test',
+        // @ts-ignore
         value: 'abc,yyy,123',
       })
     }).rejects.toThrow(DEFAULT_PROMPT_MESSAGE);

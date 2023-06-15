@@ -1,5 +1,6 @@
 import path from "path";
 import os from 'os';
+import * as setType from './actions/set/type';
 
 const Crypto = require('crypto-js');
 
@@ -43,7 +44,7 @@ export const PROVIDER_CREDENTIAL_KEYS = {
   [PROVIDER.alibaba]: ['AccessKeyID', 'AccessKeySecret'], // AccountID
   [PROVIDER.aws]: ['AccessKeyID', 'SecretAccessKey'],
   [PROVIDER.huawei]: ['AccessKeyID', 'SecretAccessKey'],
-  [PROVIDER.azure]: ['KeyVaultName', 'TenantID', 'ClentID', 'ClientSecret'],
+  [PROVIDER.azure]: ['KeyVaultName', 'TenantID', 'ClientID', 'ClientSecret'],
   [PROVIDER.baidu]: ['AccessKeyID', 'SecretAccessKey'],
   [PROVIDER.google]: ['PrivateKeyData'],
   [PROVIDER.tencent]: ['AccountID', 'SecretID', 'SecretKey'],

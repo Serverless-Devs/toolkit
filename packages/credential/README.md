@@ -37,7 +37,7 @@ const result = await credential.set(options);
 > 厂商密钥 Key：  
 > **Alibaba Cloud (alibaba)**: AccessKeyID、AccessKeySecret // AccountID 和 SecurityToken 选填  
 > **AWS (aws)**: AccessKeyID、SecretAccessKey  
-> **Azure (azure)**: KeyVaultName、TenantID、ClentID、ClientSecret  
+> **Azure (azure)**: KeyVaultName、TenantID、ClientID、ClientSecret  
 > **Baidu Cloud (baidu)**: AccessKeyID、SecretAccessKey  
 > **Google Cloud (google)**: PrivateKeyData  
 > **Huawei Cloud (huawei)**: AccessKeyID、SecretAccessKey  
@@ -101,7 +101,7 @@ const result = await credential.set({
   force: true,
   KeyVaultName: 'KeyVaultName',
   TenantID: 'TenantID',
-  ClentID: 'ClentID',
+  ClientID: 'ClientID',
   ClientSecret: 'ClientSecret',
 })
 /**
@@ -110,7 +110,7 @@ result = {
   credential: {
     KeyVaultName: 'KeyVaultName',
     TenantID: 'TenantID',
-    ClentID: 'ClentID',
+    ClientID: 'ClientID',
     ClientSecret: 'ClientSecret',
   }
  */
