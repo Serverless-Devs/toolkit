@@ -1,7 +1,8 @@
-import { each, endsWith, assign, set, transform } from "lodash"
-import { ENDS_WITH_KEY_DEVS_KEY } from "../constant";
+import { each, endsWith, assign, set, transform, intersection } from "lodash"
+import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from "../constant";
 import { getYamlContent } from "../utils";
 import decryptCredential from './decrypt';
+import { IResult } from "./set";
 
 type IAccessList = Record<string, Record<string, string>>;
 
@@ -38,6 +39,23 @@ export const getAccessFile = () => {
 }
 
 /**
+ * 获取特殊的环境变量
+ */
+export const getEnvKeyPair = (): undefined | IResult => {
+  const envKeys = Object.keys(process.env);
+
+  if (intersection(envKeys, KEY_PAIR_IMPORTANT).length === KEY_PAIR_IMPORTANT.length) {
+    const credential: Record<string, string> = {};
+
+    for (const key of KEY_PAIR_IMPORTANT) {
+      set(credential, key, process.env[key]);
+    }
+
+    return { access: SYSTEM_ENVIRONMENT_ACCESS, credential };
+  }
+}
+
+/**
  * 获取所有的密钥
  *   不包含 getAcc 和 平铺的变量
  */
@@ -45,5 +63,5 @@ export default (): IAccessList => {
   const envResult = getEnvironment();
   const yamlResult = getAccessFile();
 
-  return assign({}, yamlResult, envResult);
+  return assign(getEnvKeyPair(), yamlResult, envResult);
 }

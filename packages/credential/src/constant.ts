@@ -59,6 +59,8 @@ export const ALIYUN_CLI = '${aliyun-cli}';
 export const ALIYUN_CONFIG_FILE = path.join(os.homedir(), '.aliyun', 'config.json')
 // 通过环境变量配置特殊获取 KEY
 export const ENDS_WITH_KEY_DEVS_KEY = '_serverless_devs_key';
+// 环境变量特殊key
+export const SYSTEM_ENVIRONMENT_ACCESS = '$system_environment_access';
 // 密钥对获取最高优先级
 export const KEY_PAIR_IMPORTANT = ['AccountID', 'AccessKeyID', 'AccessKeySecret'];
 // 平台环境下设置密钥别名 key
