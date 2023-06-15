@@ -87,7 +87,7 @@ export default class SetCredential {
       const keys = get(PROVIDER_CREDENTIAL_KEYS, provider);
       // 完整包含 keys
       if (intersection(argvKeys, keys).length === keys.length) {
-        const credInformation = { __provider: provider };
+        const credInformation = { };
         each(keys, key => set(credInformation, key, argvData[key]));
 
         return credInformation;

@@ -29,7 +29,7 @@ export default class GetAccess {
 
   private access?: string;
   constructor(access?: string) {
-    this.logger = Logger.get();
+    this.logger = Logger.logger;
     this.logger.debug(`Incoming access alias is ${access}`);
     this.access = GetAccess.getAccessAlias(access);
     this.logger.debug(`The converted access alias is ${access}`);

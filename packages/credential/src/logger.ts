@@ -1,13 +1,9 @@
+
 class Logger {
-  private logger: any = console;
+  logger: any = console;
 
   set(logger: any = console) {
     this.logger = logger;
-    return logger;
-  }
-
-  get() {
-    return this.logger;
   }
 }
 

@@ -1,4 +1,4 @@
-import { each, endsWith, assign, set, transform, intersection } from "lodash"
+import { each, endsWith, assign, set, intersection } from "lodash"
 import { ENDS_WITH_KEY_DEVS_KEY, KEY_PAIR_IMPORTANT, SYSTEM_ENVIRONMENT_ACCESS } from "../constant";
 import { getYamlContent } from "../utils";
 import decryptCredential from './decrypt';
@@ -31,8 +31,8 @@ export const getEnvironment = (): IAccessList => {
 export const getAccessFile = () => {
   const yamlResult: IAccessList = getYamlContent();
 
-  transform(yamlResult, (result: IAccessList, value, key) => {
-    set(result, key, decryptCredential(value));
+  each(yamlResult, (value, key) => {
+    set(yamlResult, key, decryptCredential(value));
   })
 
   return yamlResult;

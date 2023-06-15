@@ -1,8 +1,7 @@
 import { prompt, getYamlContent, writeData } from "../utils";
 import { hasIn, unset } from "lodash";
-import Logger from "../logger";
 
-export default async function (access?: string) {
+export default async (access?: string) => {
   const content = await getYamlContent();
 
   if (access) {

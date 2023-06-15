@@ -10,7 +10,7 @@ import defaultCredential from './actions/default';
 
 
 export default class Credential {
-  constructor(logger?: any) {
+  constructor({ logger }: { logger?: any} = {}) {
     Logger.set(logger);
   }
 
@@ -19,9 +19,9 @@ export default class Credential {
     return await getAccess.run();
   };
 
-  public async set(options: Record<string, any>): Promise<IResult | undefined> {
+  public async set(options?: Record<string, any>): Promise<IResult | undefined> {
     const setCredential = new SetCredential();
-    return await setCredential.run(cloneDeep(options));
+    return await setCredential.run(cloneDeep(options || {}));
   };
 
   public getAll = getAllCredential;

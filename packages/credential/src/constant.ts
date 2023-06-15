@@ -50,8 +50,8 @@ export const PROVIDER_CREDENTIAL_KEYS = {
 }
 
 export const CRYPTO_STRING = 'SecretKey123';
-export const CRYPTO_TRUE = Crypto.AES.encrypt('true', CRYPTO_STRING);
-export const CRYPTO_FALSE = Crypto.AES.encrypt('false', CRYPTO_STRING);
+export const CRYPTO_TRUE = Crypto.AES.encrypt('true', CRYPTO_STRING).toString();
+export const CRYPTO_FALSE = Crypto.AES.encrypt('false', CRYPTO_STRING).toString();
 // 兜底的默认别名
 export const DEFAULT_NAME = 'default';
 // 兼容 aliyun-cli 获取密钥方式
@@ -65,3 +65,6 @@ export const SYSTEM_ENVIRONMENT_ACCESS = '$system_environment_access';
 export const KEY_PAIR_IMPORTANT = ['AccountID', 'AccessKeyID', 'AccessKeySecret'];
 // 平台环境下设置密钥别名 key
 export const CICD_ACCESS_ALIAS_KEY = 'serverless_devs_access_cicd_alias_name';
+
+// cicd 不能出现交互的报错信息
+export const DEFAULT_PROMPT_MESSAGE = 'Interaction in cicd environment, throwing exception';
