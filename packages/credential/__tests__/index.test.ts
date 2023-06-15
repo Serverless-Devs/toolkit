@@ -19,6 +19,7 @@ beforeAll(async () => {
     force: true,
     AccessKeyID: 'AccessKeyID',
     SecretAccessKey: 'SecretAccessKey',
+    // @ts-ignore
     Test: 'abc'
   })
 
