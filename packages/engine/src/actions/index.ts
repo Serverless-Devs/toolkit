@@ -102,6 +102,10 @@ class Actions {
     this.record.startTime = Date.now();
     this.record.lable = this.option.hookLevel === IActionLevel.PROJECT ? `[${this.option.projectName}]` : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
+    if(hookType === IHookType.POST) {
+      this.logger.warn(`The action hook 'post-<command>' has been renamed to 'complete-<command>'. 
+        You can still use them now, but we suggest to modify them.`)
+    }
     // 确保 hooks 中的变量均为解析过后的真实值
     const newHooks = getInputs(hooks, this.record.magic);  
     // post-action应获取componentProps, 先清空pluginOutput

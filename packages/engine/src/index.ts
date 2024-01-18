@@ -391,6 +391,18 @@ class Engine {
       this.recordContext(item, { error });
     }
 
+    // Attempt to fit post_<command> hook.
+    try {
+      const res = await this.actionInstance?.start(IHookType.POST, {
+        ...this.record.componentProps,
+        output: get(item, 'output', {}),
+      });
+      this.recordContext(item, get(res, 'pluginOutput', {}));
+    } catch (error) {
+      this.record.status = STEP_STATUS.FAILURE;
+      this.recordContext(item, { error });
+    }
+
     // 记录项目已经执行完成
     const process_time = getProcessTime(this.record.startTime);
     this.recordContext(item, { done: true, process_time });
