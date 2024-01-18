@@ -102,7 +102,8 @@ class Actions {
     this.record.startTime = Date.now();
     this.record.lable = this.option.hookLevel === IActionLevel.PROJECT ? `[${this.option.projectName}]` : IActionLevel.GLOBAL;
     this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
-    const newHooks = getInputs(hooks, this.record.magic);
+    // 确保 hooks 中的变量均为解析过后的真实值
+    const newHooks = getInputs(hooks, this.record.magic);  
     // post-action应获取componentProps, 先清空pluginOutput
     if (hookType !== IHookType.PRE) {
       this.record.pluginOutput = {};
