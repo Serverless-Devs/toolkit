@@ -34,6 +34,7 @@ jobs:
         run: npm run build
 
       - name: export env
+        if: matrix.os != 'windows-latest' 
         run: |
           export AccountID=123
           export AccessKeyID=123
@@ -41,5 +42,14 @@ jobs:
           export region=cn-chengdu
           export desc=this_is_a_desc
 
+      - name: export env windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          $env:AccountID=123
+          $env:AccessKeyID=123
+          $env:AccessKeySecret=123
+          $env:region=cn-chengdu
+          $env:desc=this_is_a_desc  
+  
       - name: Run tests
         run: npm run test
