@@ -48,8 +48,8 @@ jobs:
           $env:AccountID=123
           $env:AccessKeyID=123
           $env:AccessKeySecret=123
-          $env:region=cn-chengdu
-          $env:desc=this_is_a_desc  
+          $env:region="cn-chengdu"
+          $env:desc="this_is_a_desc"  
   
       - name: Run tests
         run: npm run test
