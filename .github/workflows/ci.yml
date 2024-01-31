@@ -52,4 +52,4 @@ jobs:
           $env:desc="this_is_a_desc"  
   
       - name: Run tests
-        run: npm run test
+        run: npm run ci
