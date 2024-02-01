@@ -48,6 +48,7 @@ npm run test #测试
 
 - 修改package.json中的版本号，格式为`x.x.x-beta.x(如0.0.1-beta.1)`
 - 使用`npm publish --tag=beta`发布到npm。
+- 在s工具处修改`package.json`中该包的版本号以进行e2e测试。
 
 ### 发布到npm
 
