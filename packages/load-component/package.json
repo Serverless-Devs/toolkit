@@ -24,7 +24,7 @@
     "@serverless-cd/debug": "^4.3.4",
     "@serverless-devs/downloads": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
-    "axios": "^1.4.0",
+    "axios": "^1.6.0",
     "fs-extra": "^11.1.0",
     "lodash": "^4.17.21",
     "semver": "^7.5.4"
