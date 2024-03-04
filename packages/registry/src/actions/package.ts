@@ -104,9 +104,9 @@ async function getUploadUrl(codeUri: string): Promise<string> {
 
   const yamlObject = yaml.load(publishYaml) as Record<string, any>;
   const errorMsg = `Publish.yaml illegal.
-  Application dev: https://docs.serverless-devs.com/serverless-devs/development-manual/readme
-  Component dev: https://docs.serverless-devs.com/serverless-devs/development-manual/component
-  Plugin dev: https://docs.serverless-devs.com/serverless-devs/development-manual/plugin
+  Application dev: https://manual.serverless-devs.com/dev-guide/application/
+  Component dev: https://manual.serverless-devs.com/dev-guide/component/
+  Plugin dev: https://manual.serverless-devs.com/dev-guide/plugin/
   `  
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(publishSchema);

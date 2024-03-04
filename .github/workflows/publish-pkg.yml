@@ -64,4 +64,4 @@ jobs:
           echo "No changes in ${{ matrix.package }}/package.json"
         fi
       env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
