@@ -219,7 +219,7 @@ class ParseSpec {
     const { steps, content, originSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
     const services = get(this.yaml.content, 'services', {});
     if (isEmpty(steps) && !isEmpty(services)) {
-      this.options.logger.tips('Check https://docs.serverless-devs.com/serverless-devs/yaml for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
+      this.options.logger.tips('Check https://manual.serverless-devs.com/user-guide/spec/ for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
       throw new DevsError(`Keyword 'services' has been replaced by 'resources' in 3.0.0 YAML.`, {
         trackerType: ETrackerType.parseException,
       });
