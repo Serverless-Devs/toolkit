@@ -69,7 +69,7 @@ export default class SetCredential {
       }
       set(credInformation, 'AccountID', accountId);
     } catch (ex: any) {
-      Logger.logger.warn(ex.data.Message);
+      Logger.logger.warn(get(ex, 'data.Message'));
       Logger.logger.warn('Please make sure provided access is legal, or serverless-devs service on Cloud Providers may fail.');
       if (!uid) {
         throw ex;
