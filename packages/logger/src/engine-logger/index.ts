@@ -74,7 +74,7 @@ export default class EngineLogger extends Logger {
   }
   // TODO: 仅提示但不报错
   tips(message: string, tips?: string) {
-    let msg = `\n${chalk.hex('#000').bgYellow('WARNING:')}\n\n${message}\n`;
+    let msg = `\n${chalk.hex('#000').bgYellow('TIPS:')}\n\n${message}\n`;
     if (tips) {
       msg += `\n${chalk.gray(tips)}\n`;
     }
