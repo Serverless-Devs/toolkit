@@ -18,7 +18,7 @@ export interface IInputs {
     access: string; // 访问秘钥名
   };
   getCredential: () => Promise<ICredentials | any>; // 获取用户秘钥
-  args: [];
+  args: string[];
   cwd: string;
   outputs?: Record<string, any>;
 }
