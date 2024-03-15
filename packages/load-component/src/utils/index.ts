@@ -50,6 +50,8 @@ export const buildComponentInstance = async (componentPath: string, params?: any
     if (componentInstance) {
       componentInstance.__path = componentPath;
       const publishData = getYamlContent(path.join(componentPath, 'publish.yaml'));
+      const schema = get(publishData, 'Schema');
+      componentInstance.schemaPath = schema ? path.join(componentPath, schema) : undefined;
       const version = get(publishData, 'Version');
       if (version) {
         componentInstance.__version = version;

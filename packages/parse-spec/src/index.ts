@@ -285,14 +285,12 @@ class ParseSpec {
     debug(`find flow: ${JSON.stringify(flowObj)}`);
     const projectOrder = {} as Record<string, number>;
     const fn = (projects: string[] = [], index: number) => {
-      assert(isArray(projects), `flow ${this.record.command} data format is invalid`);
+      assert(isArray(projects), `flow ${this.record.command} data format is invalid.`);
       for (const project of projects) {
-        for (const step of steps) {
-          if (project === step.projectName) {
-            newSteps.push({ ...step, flowId: index });
-            projectOrder[step.projectName] = index;
-          }
-        }
+        const step = find(steps, item => item.projectName === project);
+        assert(step, `Resource ${project} is not found. Please check the content of flow.`);
+        newSteps.push({ ...step, flowId: index });
+        projectOrder[step.projectName] = index;
       }
     };
     each(flowObj, fn);
