@@ -325,7 +325,7 @@ You can still use them now, but we suggest to modify them.`)
       exitCode: EXIT_CODE.DEVS,
       prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
       tips: `Please check the component ${componentName} has the ${command} command. Serverless Devs documents：${chalk.underline(
-        'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+        'https://manual.serverless-devs.com/',
       )}`,
       trackerType: ETrackerType.parseException,
     });
