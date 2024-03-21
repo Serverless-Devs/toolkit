@@ -133,12 +133,12 @@ class ParseSpec {
       const project = devsProject ? devsProject : get(this.yaml.content, 'name');
       // env.yaml is not exist
       if (isEmpty(envYamlContent)) {
-        this.options.logger.warn(`Environment file [${envPath}] is not found, run without environment.`);
+        this.options.logger.warnOnce(`Environment file [${envPath}] is not found, run without environment.`);
         return {};
       }
       // default-env.json is not exist
       if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
-        this.options.logger.warn(`Default env config file [${ENVIRONMENT_FILE_PATH}] is not found, run without environment.`);
+        this.options.logger.warnOnce(`Default env config file [${ENVIRONMENT_FILE_PATH}] is not found, run without environment.`);
         return {};
       }
       const { environments } = envYamlContent;
@@ -146,13 +146,13 @@ class ParseSpec {
       const defaultEnv = get(find(defaultEnvContent, { project: project }), 'default');
       // project is not found in default-env.json
       if (!defaultEnv) {
-        this.options.logger.warn(`Default env is not set, run without environment.`);
+        this.options.logger.warnOnce(`Default env is not set, run without environment.`);
         return {};
       }
       const environment = find(environments, item => item.name === defaultEnv);
       // default env is not found in env.yaml
       if (isEmpty(environment)) {
-        this.options.logger.warn(`Default env [${defaultEnv}] is not found, run without environment.`);
+        this.options.logger.warnOnce(`Default env [${defaultEnv}] is not found, run without environment.`);
         return {};
       }
       return { project, environment };
@@ -171,9 +171,8 @@ class ParseSpec {
     const envYamlContent = utils.getYamlContent(envPath);
     // env file is not exist
     if (isEmpty(envYamlContent)) {
-      throw new DevsError(`Environment file [${envPath}] is not exist`, {
-        trackerType: ETrackerType.parseException,
-      });
+      this.options.logger.warnOnce(`Environment file [${envPath}] is not found, run without environment.`);
+      return {};
     }
     debug(`environment content: ${JSON.stringify(envYamlContent)}`);
     const { environments } = envYamlContent;
@@ -183,10 +182,8 @@ class ParseSpec {
     const environment = find(environments, item => item.name === this.record.env);
     // env name is not found
     if (isEmpty(environment)) {
-      // TODO: @封崇
-      throw new DevsError(`Env [${this.record.env}] was not found`, {
-        trackerType: ETrackerType.parseException,
-      });
+      this.options.logger.warnOnce(`Env [${this.record.env}] was not found, run without environment.`);
+      return {};
     }
     return { project, environment };
   }
