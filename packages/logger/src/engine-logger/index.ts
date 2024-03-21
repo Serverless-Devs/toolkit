@@ -13,6 +13,9 @@ export default class EngineLogger extends Logger {
   private eol: string;
   private key: string;
   private level: LoggerLevel;
+  private writeMsg: string;
+  private tipsMsg: string;
+  private warnMsg: string;
 
   constructor(props: IOptions) {
     super({} as EggLoggerOptions);
@@ -29,6 +32,9 @@ export default class EngineLogger extends Logger {
     this.level = level || get(props, 'level', 'INFO');
     this.eol = eol;
     this.key = key;
+    this.writeMsg = '';
+    this.tipsMsg = '';
+    this.warnMsg = '';
 
     const consoleTransport = new ConsoleTransport({
       level: level || get(props, 'level', 'INFO'),
@@ -81,8 +87,27 @@ export default class EngineLogger extends Logger {
     this.write(msg);
   }
 
+  tipsOnce(message: string, tips?: string) {
+    if (this.tipsMsg === message + tips) return;
+    this.tipsMsg = message + tips;
+    this.tips(message, tips);
+  }
+
   write(msg: string) {
     super.write(transport.transportSecrets(msg));
+  }
+
+  // 多个相同write输出的时候，只保留第一个
+  writeOnce(msg: string) {
+    if (msg === this.writeMsg) return;
+    this.writeMsg = msg;
+    this.write(msg);
+  }
+
+  warnOnce(msg: string) {
+    if (msg === this.warnMsg) return;
+    this.warnMsg = msg;
+    super.warn(msg);
   }
 
   private setEol(eol: string = os.EOL) {

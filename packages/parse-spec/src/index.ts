@@ -128,39 +128,32 @@ class ParseSpec {
     if (has(this.yaml.content, ENVIRONMENT_KEY)) {
       const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY), path.dirname(this.yaml.path));
       const envYamlContent = utils.getYamlContent(envPath);
-      // env.yaml is not exist
-      if (isEmpty(envYamlContent)) {
-        throw new DevsError(`Environment file [${envPath}] is not found`, {
-          tips: 'You can create a new environment file by running `s env init`',
-          trackerType: ETrackerType.parseException,
-        });
-      }
-      // default-env.json is not exist
-      if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
-        throw new DevsError('Default env is not found', {
-          tips: 'You can set a default environment by running `s env default`',
-          trackerType: ETrackerType.parseException,
-        });
-      }
-      const { environments } = envYamlContent;
       // 若存在环境变量，默认项目为devsProject
       const devsProject = process.env.ALIYUN_DEVS_REMOTE_PROJECT_NAME;
       const project = devsProject ? devsProject : get(this.yaml.content, 'name');
+      // env.yaml is not exist
+      if (isEmpty(envYamlContent)) {
+        this.options.logger.warnOnce(`Environment file [${envPath}] is not found, run without environment.`);
+        return {};
+      }
+      // default-env.json is not exist
+      if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
+        this.options.logger.warnOnce(`Default env config file [${ENVIRONMENT_FILE_PATH}] is not found, run without environment.`);
+        return {};
+      }
+      const { environments } = envYamlContent;
       const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
       const defaultEnv = get(find(defaultEnvContent, { project: project }), 'default');
       // project is not found in default-env.json
       if (!defaultEnv) {
-        throw new DevsError('Default env is not found', {
-          tips: 'You can set a default environment by running `s env default`',
-          trackerType: ETrackerType.parseException,
-        });
+        this.options.logger.warnOnce(`Default env is not set, run without environment.`);
+        return {};
       }
       const environment = find(environments, item => item.name === defaultEnv);
       // default env is not found in env.yaml
       if (isEmpty(environment)) {
-        throw new DevsError(`Default env [${defaultEnv}] was not found`, {
-          trackerType: ETrackerType.parseException,
-        });
+        this.options.logger.warnOnce(`Default env [${defaultEnv}] is not found, run without environment.`);
+        return {};
       }
       return { project, environment };
     }
@@ -178,9 +171,8 @@ class ParseSpec {
     const envYamlContent = utils.getYamlContent(envPath);
     // env file is not exist
     if (isEmpty(envYamlContent)) {
-      throw new DevsError(`Environment file [${envPath}] is not exist`, {
-        trackerType: ETrackerType.parseException,
-      });
+      this.options.logger.warnOnce(`Environment file [${envPath}] is not found, run without environment.`);
+      return {};
     }
     debug(`environment content: ${JSON.stringify(envYamlContent)}`);
     const { environments } = envYamlContent;
@@ -190,10 +182,8 @@ class ParseSpec {
     const environment = find(environments, item => item.name === this.record.env);
     // env name is not found
     if (isEmpty(environment)) {
-      // TODO: @封崇
-      throw new DevsError(`Env [${this.record.env}] was not found`, {
-        trackerType: ETrackerType.parseException,
-      });
+      this.options.logger.warnOnce(`Env [${this.record.env}] was not found, run without environment.`);
+      return {};
     }
     return { project, environment };
   }
