@@ -13,7 +13,7 @@ export default async (template: string, options: IOptions = {}) => {
     return await v3(template, options);
   }
   assert(template, 'template is required');
-  if (includes(template, '/') && REGISTRY.CUSTOM_URL in [REGISTRY.V3, REGISTRY.V2]) {
+  if ((includes(template, '/') && REGISTRY.CUSTOM_URL === REGISTRY.V3) || (REGISTRY.CUSTOM_URL === REGISTRY.V2)) {
     return await v2(template, options);
   }
   try {
