@@ -79,6 +79,22 @@ class Download {
         // ignore error in windows
       }
     }
+    // support github zip
+    const items = fs.readdirSync(dest as string, { withFileTypes: true });
+    const directories = items.filter(item => item.isDirectory());
+    // only one directory, move
+    if (directories.length === 1 && items.length === 1) {
+      try {
+        const directoryName = directories[0].name;
+        const directoryPath = path.join(dest as string, directoryName);
+        const tmpFilePath = path.join(dest as string, `../${filePath}-${Date.now()}`);
+        fs.moveSync(directoryPath, tmpFilePath, { overwrite: true });
+        fs.moveSync(tmpFilePath, dest as string, { overwrite: true });
+        fs.removeSync(tmpFilePath);
+      } catch(e) {
+        throw e;
+      }
+    }
   }
   private async doDownload(url: string): Promise<string> {
     const { headers, logger } = this.options;
