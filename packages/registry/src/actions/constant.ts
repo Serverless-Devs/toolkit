@@ -44,6 +44,7 @@ export const publishSchema = {
           "Google Cloud Platform",
           "专有云",
           "其它",
+          "火山引擎",
           "Alibaba Cloud",
           "Tencent Cloud",
           "Huawei Cloud",
