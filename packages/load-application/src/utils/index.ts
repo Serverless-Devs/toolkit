@@ -1,5 +1,5 @@
 import { endsWith, keys, replace } from 'lodash';
-import { RANDOM_PATTERN, REGISTRY, GITHUB_REGISTRY } from '../constant';
+import { RANDOM_PATTERN, REGISTRY } from '../constant';
 import Credential from '@serverless-devs/credential';
 
 export { default as getInputs } from './get-inputs';
@@ -11,7 +11,7 @@ export const tryfun = async (fn: Function, ...args: any[]) => {
 };
 
 export const getUrlWithLatest = (name: string) => {
-  if (REGISTRY.CUSTOM_URL === GITHUB_REGISTRY) {
+  if (REGISTRY.CUSTOM_URL !== REGISTRY.V3) {
     return `${REGISTRY.CUSTOM_URL}/${name}`;
   }
   return `${REGISTRY.V3}/packages/${name}/release/latest`
