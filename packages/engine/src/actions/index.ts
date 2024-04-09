@@ -291,7 +291,7 @@ You can still use them now, but we suggest to modify them.`)
       // 方法存在，执行报错，退出码101
       const newInputs = {
         ...this.record.componentProps,
-        argv: filter(argv.slice(2), o => !includes([componentName, command], o)),
+        args: filter(argv.slice(2), o => !includes([componentName, command], o)),
       };
       try {
         // Execute the command for the component with the prepared inputs.
