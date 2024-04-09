@@ -42,6 +42,10 @@ const getEntryFile = async (componentPath: string) => {
 
 export const buildComponentInstance = async (componentPath: string, params?: any) => {
   const requirePath = await getEntryFile(componentPath);
+  // bug: `- component: fc invoke` timeout. Delete require cache
+  try {
+    delete require.cache[requirePath];
+  } catch {}
   const baseChildComponent = await require(requirePath);
 
   const ChildComponent = baseChildComponent.default || baseChildComponent;
