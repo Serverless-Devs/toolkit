@@ -1,4 +1,4 @@
-import { endsWith, keys, replace, split } from 'lodash';
+import { keys, replace, split } from 'lodash';
 import { RANDOM_PATTERN, REGISTRY, GITHUB_REGISTRY } from '../constant';
 import Credential from '@serverless-devs/credential';
 
@@ -30,5 +30,5 @@ export const getAllCredential = async ({ logger }: any) => {
 
 export const getDefaultValue = (value: any) => {
   if (typeof value !== 'string') return;
-  return endsWith(value, RANDOM_PATTERN) ? replace(value, RANDOM_PATTERN, randomId()) : value;
+  return replace(value, RANDOM_PATTERN, randomId());
 };

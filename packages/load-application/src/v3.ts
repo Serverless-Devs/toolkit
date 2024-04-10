@@ -4,7 +4,7 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith } from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
@@ -212,6 +212,7 @@ class LoadApplication {
     const properties = get(publishData, 'Parameters.properties');
     const requiredList = get(publishData, 'Parameters.required');
     const promptList = [];
+    const tmpResult: any = {};
     if (properties) {
       let rangeList = [];
       for (const key in properties) {
@@ -232,8 +233,11 @@ class LoadApplication {
           }
           return true;
         };
-        // 布尔类型
-        if (item.type === 'boolean') {
+        if (item.input === 'false' || item.input === false) {
+          // 不手动输入
+          tmpResult[name] = getDefaultValue(item.default) || '';
+        } else if (item.type === 'boolean') {
+          // 布尔类型
           promptList.push({
             type: 'confirm',
             name,
@@ -313,6 +317,7 @@ class LoadApplication {
         result.access = DEFAULT_MAGIC_ACCESS;
       }
     }
+    result = merge(tmpResult, result);
     return result;
   }
   private async getCredentialDirectly() {
