@@ -4,17 +4,16 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys } from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
 import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue } from './utils';
-import assert from 'assert';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
-import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, gray } from './constant';
+import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray } from './constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
 
 class LoadApplication {
@@ -52,7 +51,7 @@ class LoadApplication {
    */
   private secretList: string[] = [];
   constructor(private template: string, private options: IOptions = {}) {
-    assert(!includes(this.template, '/'), `The component name ${this.template} cannot contain /`);
+    // assert(!includes(this.template, '/'), `The component name ${this.template} cannot contain /`);
     this.options.dest = this.options.dest || process.cwd();
     this.options.logger = this.options.logger || console;
     const [name, version] = split(this.template, '@');
@@ -213,6 +212,7 @@ class LoadApplication {
     const properties = get(publishData, 'Parameters.properties');
     const requiredList = get(publishData, 'Parameters.required');
     const promptList = [];
+    const tmpResult: any = {};
     if (properties) {
       let rangeList = [];
       for (const key in properties) {
@@ -233,8 +233,11 @@ class LoadApplication {
           }
           return true;
         };
-        // 布尔类型
-        if (item.type === 'boolean') {
+        if (item.input === 'false' || item.input === false) {
+          // 不手动输入
+          tmpResult[name] = getDefaultValue(item.default) || '';
+        } else if (item.type === 'boolean') {
+          // 布尔类型
           promptList.push({
             type: 'confirm',
             name,
@@ -314,6 +317,7 @@ class LoadApplication {
         result.access = DEFAULT_MAGIC_ACCESS;
       }
     }
+    result = merge(tmpResult, result);
     return result;
   }
   private async getCredentialDirectly() {
@@ -372,22 +376,52 @@ class LoadApplication {
     const { logger } = this.options;
     const zipball_url = this.options.uri || (await this.getZipballUrl());
     debug(`zipball_url: ${zipball_url}`);
-    await download(zipball_url, {
-      dest: this.tempPath,
-      logger,
-      extract: true,
-      headers: {
-        ...registry.getSignHeaders(),
-        devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
-      },
-      filename: this.name,
-    });
+    try {
+      await download(zipball_url, {
+        dest: this.tempPath,
+        logger,
+        extract: true,
+        headers: {
+          'User-Agent': 'Serverless-Devs (https://github.com/Serverless-Devs/Serverless-Devs)',
+          ...registry.getSignHeaders(),
+          devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
+        },
+        // use final element as filename
+        filename: split(this.name, '/')[-1],
+      });
+    } catch(e) {
+      logger.debug(e);
+      // if https, try http
+      if (startsWith(zipball_url, 'https')) {
+        logger.debug('https error, try http');
+        const newZipballUrl = zipball_url.replace('https://', 'http://');
+        await download(zipball_url, {
+          dest: this.tempPath,
+          logger,
+          extract: true,
+          headers: {
+            'User-Agent': 'Serverless-Devs (https://github.com/Serverless-Devs/Serverless-Devs)',
+            ...registry.getSignHeaders(),
+            devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
+          },
+          // use final element as filename
+          filename: split(this.name, '/')[-1],
+        });
+      } else {
+        throw e;
+      }
+    }
   }
   private getZipballUrl = async () => {
     const url = this.version ? getUrlWithVersion(this.name, this.version) : getUrlWithLatest(this.name);
     debug(`url: ${url}`);
     const res = await axios.get(url, { headers: registry.getSignHeaders() });
     debug(`res: ${JSON.stringify(res.data)}`);
+    if (startsWith(url, GITHUB_REGISTRY)) {
+      const defaultBranch = get(res, 'data.default_branch');
+      if (isEmpty(defaultBranch)) throw new Error(`Default branch is not found`);
+      return url + `/zipball/${defaultBranch}`;
+    }
     const zipball_url = get(res, 'data.body.zipball_url');
     const template = this.version ? `${this.name}@${this.version}` : this.name;
     if (isEmpty(zipball_url)) throw new Error(`Application ${template} is not found`);

@@ -4,7 +4,7 @@ import axios from 'axios';
 import download from '@serverless-devs/downloads';
 import artTemplate from 'art-template';
 import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, find } from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, find, startsWith } from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, REGISTRY } from './constant';
@@ -374,13 +374,31 @@ class LoadApplication {
   private async doLoad() {
     const { logger } = this.options;
     const zipball_url = this.version ? await this.doZipballUrlWithVersion() : await this.doZipballUrl();
-    await download(zipball_url, {
-      dest: this.tempPath,
-      logger,
-      extract: true,
-      strip: 1,
-      filename: this.name,
-    });
+    try {
+      await download(zipball_url, {
+        dest: this.tempPath,
+        logger,
+        extract: true,
+        strip: 1,
+        filename: this.name,
+      });
+    } catch(e) {
+      logger.debug(e);
+      // if https, try http
+      if (startsWith(zipball_url, 'https')) {
+        logger.debug('https error, try http');
+        const newZipballUrl = zipball_url.replace('https://', 'http://');
+        await download(newZipballUrl, {
+          dest: this.tempPath,
+          logger,
+          extract: true,
+          strip: 1,
+          filename: this.name,
+        });
+      } else {
+        throw e;
+      }
+    }
   }
   private async doZipballUrl() {
     const maps = {

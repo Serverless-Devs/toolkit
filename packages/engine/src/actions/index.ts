@@ -18,7 +18,7 @@ interface IRecord {
   magic: Record<string, any>; // 记录魔法变量
   componentProps: Record<string, any>; // 记录组件的inputs
   pluginOutput: Record<string, any>; // 记录plugin的outputs
-  lable: string; // 记录执行的label
+  label: string; // 记录执行的label
   step: IStepOptions; // 记录当前step
   allowFailure: boolean | IAllowFailure; // step allow_failure > action allow_failure
   command: string; // 记录当前执行的command
@@ -106,8 +106,8 @@ You can still use them now, but we suggest to modify them.`)
     const hooks = filter(this.actions, item => item.hookType === hookType);
     if (isEmpty(hooks)) return {};
     this.record.startTime = Date.now();
-    this.record.lable = this.option.hookLevel === IActionLevel.PROJECT ? `[${this.option.projectName}]` : IActionLevel.GLOBAL;
-    this.logger.debug(`Start executing the ${hookType}-action in ${this.record.lable}`);
+    this.record.label = this.option.hookLevel === IActionLevel.PROJECT ? `[${this.option.projectName}]` : IActionLevel.GLOBAL;
+    this.logger.debug(`Start executing the ${hookType}-action in ${this.record.label}`);
     // 确保 hooks 中的变量均为解析过后的真实值
     const newHooks = getInputs(hooks, this.record.magic);  
     // post-action应获取componentProps, 先清空pluginOutput
@@ -128,7 +128,7 @@ You can still use them now, but we suggest to modify them.`)
         await this.component(hook);
       }
     }
-    this.logger.debug(`The ${hookType}-action successfully to execute in ${this.record.lable}`);
+    this.logger.debug(`The ${hookType}-action successfully to execute in ${this.record.label}`);
 
     if (this.option.hookLevel === IActionLevel.GLOBAL) {
       this.logger.write(`${chalk.green('✔')} ${chalk.gray(`${IActionLevel.GLOBAL} ${hookType}-action completed (${getProcessTime(this.record.startTime)})`)}`);
@@ -207,7 +207,7 @@ You can still use them now, but we suggest to modify them.`)
           data: get(e, 'data'),
           stack: error.stack,
           exitCode: EXIT_CODE.RUN,
-          prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+          prefix: `${this.record.label} ${hook.hookType}-action failed to [${this.record.command}]:`,
           trackerType: ETrackerType.runtimeException,
         });
       }
@@ -221,7 +221,7 @@ You can still use them now, but we suggest to modify them.`)
     if (useAllowFailure) return;
     throw new DevsError(`The ${hook.path} directory does not exist.`, {
       exitCode: EXIT_CODE.DEVS,
-      prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+      prefix: `${this.record.label} ${hook.hookType}-action failed to [${this.record.command}]:`,
       trackerType: ETrackerType.parseException,
     });
   }
@@ -257,7 +257,7 @@ You can still use them now, but we suggest to modify them.`)
         data: get(e, 'data'),
         stack: error.stack,
         exitCode: EXIT_CODE.PLUGIN,
-        prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+        prefix: `${this.record.label} ${hook.hookType}-action failed to [${this.record.command}]:`,
         trackerType: ETrackerType.runtimeException,
       });
     }
@@ -291,11 +291,12 @@ You can still use them now, but we suggest to modify them.`)
       // 方法存在，执行报错，退出码101
       const newInputs = {
         ...this.record.componentProps,
-        argv: filter(argv.slice(2), o => !includes([componentName, command], o)),
+        args: filter(argv.slice(2), o => !includes([componentName, command], o)),
       };
       try {
         // Execute the command for the component with the prepared inputs.
-        return await instance[command](newInputs);
+        await instance[command](newInputs);
+        return;
       } catch (e) {
         const error = e as Error;
         // Check if the failure is allowed based on the record's allowFailure setting.
@@ -308,7 +309,7 @@ You can still use them now, but we suggest to modify them.`)
           data: get(e, 'data'),
           stack: error.stack,
           exitCode: EXIT_CODE.COMPONENT,
-          prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+          prefix: `${this.record.label} ${hook.hookType}-action failed to [${this.record.command}]:`,
           trackerType: ETrackerType.runtimeException,
         });
       }
@@ -323,9 +324,9 @@ You can still use them now, but we suggest to modify them.`)
     // 方法不存在，此时系统将会认为是未找到组件方法，系统的exit code为100；
     throw new DevsError(`The [${command}] command was not found.`, {
       exitCode: EXIT_CODE.DEVS,
-      prefix: `${this.record.lable} ${hook.hookType}-action failed to [${this.record.command}]:`,
+      prefix: `${this.record.label} ${hook.hookType}-action failed to [${this.record.command}]:`,
       tips: `Please check the component ${componentName} has the ${command} command. Serverless Devs documents：${chalk.underline(
-        'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+        'https://manual.serverless-devs.com/',
       )}`,
       trackerType: ETrackerType.parseException,
     });

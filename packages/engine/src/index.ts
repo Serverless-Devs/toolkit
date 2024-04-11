@@ -12,6 +12,7 @@ import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
 import { EXIT_CODE } from './constants';
 import assert from 'assert';
+import Ajv from 'ajv';
 export * from './types';
 export { verify, preview } from './utils';
 
@@ -91,7 +92,7 @@ class Engine {
       return this.context;
     }
     const { steps: _steps, yaml, command, access = yaml.access } = this.spec;
-    this.logger.write(`${emoji('⌛')} Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`);
+    this.logger.write(chalk.gray(`${emoji('⌛')} Steps for [${command}] of [${get(this.spec, 'yaml.appName')}]\n${chalk.gray('====================')}`));
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
@@ -206,14 +207,54 @@ class Engine {
    */
   private async validate() {
     const { steps, command, projectName } = this.spec;
+    let errorsList: any[] = [];
+    const ajv = new Ajv({ allErrors: true });
+    assert(!isEmpty(steps), 'Step is required');
     for (const step of steps) {
-      const instance = await loadComponent(step.component, { engineLogger: this.logger });
+      const instance = await loadComponent(step.component, { logger: this.logger, engineLogger: this.logger });
       if (projectName && keys(get(instance, 'commands')).includes(projectName)) {
-        assert(!projectName, `The name of the project [${projectName}] overlaps with a command, please change it's name`);
+        throw new DevsError(`The name of the project [${projectName}] overlaps with a command, please change it's name.`, {
+          exitCode: EXIT_CODE.DEVS,
+          trackerType: ETrackerType.parseException,
+          prefix: `[${projectName}] failed to [${command}]:`
+        });
+      }
+      // schema validation
+      if (get(this.spec, 'yaml.use3x') && get(this.spec, 'yaml.content.validation')) {
+        const schema = await this.getSchemaByInstance(instance);
+        if (isEmpty(schema)) continue;
+        const validate = ajv.compile(JSON.parse(schema));
+        if (!validate(step.props)) {
+          const errors = validate.errors;
+          if (!errors) continue;
+          for (const j of errors) {
+            j.instancePath = step.projectName + '/props' + j.instancePath;
+            if (j.keyword === 'enum') {
+              j.message = j.message + ': ' + j.params.allowedValues.join(', ');
+            }
+          }
+          errorsList = errorsList.concat(errors);
+        }
       }
     }
-    assert(!isEmpty(steps), 'Step is required');
     assert(command, 'Command is required');
+    if (!isEmpty(errorsList)) {
+      throw new DevsError(`${ajv.errorsText(errorsList, { dataVar: '', separator: '\n' })}`, {
+        exitCode: EXIT_CODE.DEVS,
+        trackerType: ETrackerType.parseException,
+        prefix: 'Function props validation error:'
+      });
+    }
+  }
+
+  /**
+   * Get schema by existing instance, avoid loading components.
+   * @param instance loadComponent instance
+   * @param logger Logger
+   */
+  private getSchemaByInstance(instance: any) {
+    if (!instance || !instance.getSchema) return null;
+    return instance.getSchema();
   }
 
   /**
@@ -298,7 +339,7 @@ class Engine {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
       resources: {},
-      __runtime: this.options.verify ? 'enigne' : 'parse',
+      __runtime: this.options.verify ? 'engine' : 'parse',
       __steps: this.context.steps,
     } as Record<string, any>;
     for (const obj of this.context.steps) {
@@ -599,7 +640,7 @@ class Engine {
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
         tips: `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：${chalk.underline(
-          'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command',
+          'https://manual.serverless-devs.com/',
         )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
         trackerType: ETrackerType.parseException,
@@ -629,7 +670,7 @@ class Engine {
     // 方法不存在，进行警告，但是并不会报错，最终的exit code为0；
     this.logger.tips(
       `The [${command}] command was not found.`,
-      `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`,
+      `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：https://manual.serverless-devs.com/`,
     );
   }
 
