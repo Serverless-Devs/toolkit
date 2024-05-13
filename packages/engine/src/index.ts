@@ -1,5 +1,5 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys } from 'lodash';
+import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
 import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
@@ -597,10 +597,13 @@ class Engine {
    */
   private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
     // Extract command and projectName from the specification.
-    const { command = '', projectName } = this.spec;
+    const { command = '', projectName, yaml } = this.spec;
 
     // Retrieve properties for the given project step.
     const newInputs = await this.getProps(item);
+    // default '-y' when flow projects > 1 (workaround for inquirer bug)
+    const flowProject = yaml.useFlow ? filter(this.context.steps, o => o.flowId === item.flowId) : [item];
+    if (size(flowProject) > 1) newInputs.args.push('-y');
 
     // Set component properties based on the provided data or the newly retrieved properties.
     this.record.componentProps = isEmpty(data.pluginOutput) ? newInputs : data.pluginOutput;

@@ -125,38 +125,33 @@ class ParseSpec {
         });
       }
     }
-    if (has(this.yaml.content, ENVIRONMENT_KEY)) {
-      const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY), path.dirname(this.yaml.path));
-      const envYamlContent = utils.getYamlContent(envPath);
-      // 若存在环境变量，默认项目为devsProject
-      const devsProject = process.env.ALIYUN_DEVS_REMOTE_PROJECT_NAME;
-      const project = devsProject ? devsProject : get(this.yaml.content, 'name');
-      // env.yaml is not exist
-      if (isEmpty(envYamlContent)) {
-        this.options.logger.warnOnce(`Environment file [${envPath}] is not found, run without environment.`);
-        return {};
-      }
-      // default-env.json is not exist
-      if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
-        this.options.logger.warnOnce(`Default env config file [${ENVIRONMENT_FILE_PATH}] is not found, run without environment.`);
-        return {};
-      }
-      const { environments } = envYamlContent;
-      const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
-      const defaultEnv = get(find(defaultEnvContent, { project: project }), 'default');
-      // project is not found in default-env.json
-      if (!defaultEnv) {
-        this.options.logger.warnOnce(`Default env is not set, run without environment.`);
-        return {};
-      }
-      const environment = find(environments, item => item.name === defaultEnv);
-      // default env is not found in env.yaml
-      if (isEmpty(environment)) {
-        this.options.logger.warnOnce(`Default env [${defaultEnv}] is not found, run without environment.`);
-        return {};
-      }
-      return { project, environment };
+    // default-env.json is not exist
+    if (!fs.existsSync(ENVIRONMENT_FILE_PATH)) {
+      return {};
     }
+    // 若存在环境变量，默认项目为devsProject
+    const devsProject = process.env.ALIYUN_DEVS_REMOTE_PROJECT_NAME;
+    const project = devsProject ? devsProject : get(this.yaml.content, 'name');
+    const defaultEnvContent = require(ENVIRONMENT_FILE_PATH);
+    const defaultEnv = get(find(defaultEnvContent, { project: project }), 'default');
+    // project is not found in default-env.json
+    if (isEmpty(defaultEnv)) {
+      return {};
+    }
+    const envPath: string = utils.getAbsolutePath(get(this.yaml.content, ENVIRONMENT_KEY) || 'env.yaml', path.dirname(this.yaml.path));
+    const envYamlContent = utils.getYamlContent(envPath);
+    if (isEmpty(envYamlContent)) {
+      this.options.logger.warnOnce(`Environment file [${envPath}] is not found, run without environment.`);
+      return {};
+    }
+    const { environments } = envYamlContent;
+    const environment = find(environments, item => item.name === defaultEnv);
+    // default env is not found in env.yaml
+    if (isEmpty(environment)) {
+      this.options.logger.warnOnce(`Default env [${defaultEnv}] is not found, run without environment.`);
+      return {};
+    }
+    return { project, environment };
   }
   // specify --env
   private doEnvWithSpecify() {

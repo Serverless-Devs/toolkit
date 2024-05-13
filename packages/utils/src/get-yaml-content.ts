@@ -34,7 +34,7 @@ export default function getYamlContent(filePath: string): Record<string, any> {
       let message = `${filename} format is incorrect`;
       if (error.message) message += `: ${error.message}`;
       throw new DevsError(message, {
-        tips: `Please check the configuration of ${filename}, Serverless Devs' Yaml specification document can refer to：'https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/yaml.md'`,
+        tips: `Please check the configuration of ${filename}, Serverless Devs' Yaml specification document can refer to：'https://docs.serverless-devs.com/user-guide/spec/'`,
         trackerType: ETrackerType.parseException,
       });
     }
