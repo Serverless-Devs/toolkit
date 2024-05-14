@@ -2,7 +2,7 @@ import zip from '@serverless-devs/zip';
 import { getRootHome, registry } from '@serverless-devs/utils';
 import fs from 'fs';
 import { getYamlContentText, getContentText, request } from '../util';
-import { PUBLISH_URL } from '../request-url';
+import { PUBLISH_URL, PRIVATE_LIST_URL } from '../request-url';
 import logger from '../util/logger';
 import path from 'path';
 import yaml from 'js-yaml';
@@ -165,13 +165,16 @@ export interface IList {
   tag?: string;
   search?: string;
   page?: string;
+  private?: boolean;
 }
 
 export const list = async (options?: IList) => {
   const headers = registry.getSignHeaders();
-  const qs = querystring.stringify((options || {}) as any);
-  const uri = `${PUBLISH_URL}?${qs}`;
+  const { private: _private, ...rest } = options || {};
+  const qs = querystring.stringify((rest || {}) as any);
+  const uri = _private ? `${PRIVATE_LIST_URL}?${qs}` : `${PUBLISH_URL}?${qs}`;
 
+  logger.debug(`Get registry list uri: ${uri}`);
   const { body, request_id } = await request.new_request_get(uri, headers);
   logger.debug(`Get registry list responseId: ${request_id}`);
 
