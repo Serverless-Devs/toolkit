@@ -9,6 +9,7 @@ export enum PROVIDER {
   alibaba = 'Alibaba Cloud',
   baidu = 'Baidu Cloud',
   huawei = 'Huawei Cloud',
+  volcengine = 'Volcengine',
   aws = 'AWS',
   azure = 'Azure',
   google = 'Google Cloud',
@@ -19,6 +20,7 @@ export enum PROVIDER {
 // 选择厂商
 export const PROVIDER_LIST = [
   { name: 'Alibaba Cloud (alibaba)', value: PROVIDER.alibaba },
+  { name: 'Volcengine (volcengine)', value: PROVIDER.volcengine },
   { name: 'AWS (aws)', value: PROVIDER.aws },
   { name: 'Azure (azure)', value: PROVIDER.azure },
   { name: 'Baidu Cloud (baidu)', value: PROVIDER.baidu },
@@ -37,6 +39,7 @@ export const PROVIDER_DOCS = {
   [PROVIDER.baidu]: 'http://config.devsapp.net/account/baidu',
   [PROVIDER.google]: 'http://config.devsapp.net/account/gcp',
   [PROVIDER.tencent]: 'http://config.devsapp.net/account/tencent',
+  [PROVIDER.volcengine]: 'https://www.volcengine.com/docs/6291/65568',
 };
 
 // 厂商密钥Key列表
@@ -48,6 +51,7 @@ export const PROVIDER_CREDENTIAL_KEYS = {
   [PROVIDER.baidu]: ['AccessKeyID', 'SecretAccessKey'],
   [PROVIDER.google]: ['PrivateKeyData'],
   [PROVIDER.tencent]: ['AccountID', 'SecretID', 'SecretKey'],
+  [PROVIDER.volcengine]: ['AccessKey', 'SecretKey'],
 };
 
 export const CRYPTO_STRING = 'SecretKey123';
