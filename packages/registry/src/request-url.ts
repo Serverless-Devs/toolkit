@@ -11,6 +11,9 @@ export const RESET_URL = `${baseUrl}/user/token`;
 // *** 发布 *** //
 export const PUBLISH_URL = `${baseUrl}/packages/releases`;
 
+// *** 用户Packages查找 *** //
+export const PRIVATE_LIST_URL = `${baseUrl}/package/user`;
+
 // *** 指定仓库详情 *** //
 export const getDetailUrl = (name: string) => `${baseUrl}/packages/${name}/release`;
 

@@ -10,7 +10,7 @@ import { getDefaultYamlPath, isExtendMode } from './utils';
 const compile = require('@serverless-devs/art-template/lib/devs-compile');
 import Order from './order';
 import ParseContent from './parse-content';
-import { each, filter, find, get, has, includes, isArray, isEmpty, keys, map, set, split } from 'lodash';
+import { each, filter, find, get, has, includes, isArray, isEmpty, isString, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
 import assert from 'assert';
@@ -56,7 +56,8 @@ class ParseSpec {
 
     // 兼容2.0: 加入项目的.env环境变量
     for (const i of this.yaml.projectNames) {
-      if (get(projects, `${i}.props.code`)) {
+      const code = get(projects, `${i}.props.code`);
+      if (code && isString(code)) {
         const codePath = utils.getAbsolutePath(get(projects, `${i}.props.code`, ''));
         expand(dotenv.config({ path: path.join(codePath, '.env') }));
       }
