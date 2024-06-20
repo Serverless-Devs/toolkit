@@ -140,6 +140,9 @@ importers:
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
+      '@serverless-devs/load-application':
+        specifier: workspace:^
+        version: link:../load-application
       '@serverless-devs/load-component':
         specifier: workspace:^
         version: link:../load-component

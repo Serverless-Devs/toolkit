@@ -6,6 +6,8 @@ import { get, omit, set, map, includes, isEmpty } from 'lodash';
 import fs from 'fs-extra';
 import Ajv from 'ajv';
 import loadComponent from '@serverless-devs/load-component';
+import loadApplication from '@serverless-devs/load-application';
+import path from 'path';
 
 export function getLogPath(filePath: string) {
   return `step_${filePath}.log`;
@@ -63,6 +65,59 @@ export const getAllowFailure = (allowFailure: boolean | IAllowFailure | undefine
     return includes(get(allowFailure, 'command'), get(data, 'command'));
   }
   return false;
+};
+
+/**
+ * Init command function.   
+ * Example: 
+ * ```javascript
+ * await init('start-fc3-nodejs', { 
+ *   parameters: { region: 'cn-hangzhou' }, 
+ *   access: 'default',
+ *   projectName: 'my-project',
+ * });
+ * ```
+ * Returns:
+ * ```json
+ * {
+ *   "s.yaml": "...",
+ *   "env.yaml": "...",
+ *   "cd.yaml": "..."
+ * }
+ * ```
+ * @param template template name.
+ * @param options init options.
+ * @returns string 
+ */
+export async function init(
+  template: string,
+  options: {
+    parameters: Record<string, any>;
+    access: string;
+    projectName: string;
+    uri?: string;
+  }
+): Promise<string> {
+  const appPath = await loadApplication(template, {
+    dest: process.cwd(),
+    logger: console,
+    projectName: options.projectName,
+    parameters: options.parameters,
+    access: options.access,
+    uri: options.uri,
+    y: true,
+    overwrite: true,
+  }) as string;
+  const files = ['s.yaml', 'env.yaml', 'cd.yaml'];
+  const yaml_contents: Record<string, string> = {};
+  for (const file of files) {
+    const filePath = path.join(appPath, file);
+    if (await fs.pathExists(filePath)) {
+      const content = await fs.readFile(filePath, 'utf-8');
+      yaml_contents[file] = content;
+    }
+  }
+  return JSON.stringify(yaml_contents);
 };
 
 /**
