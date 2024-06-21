@@ -772,7 +772,7 @@ describe('Engine Class', () => {
 
                 expect(loggerSpy).toHaveBeenCalledWith(
                     `The [deploy] command was not found.`,
-                    `Please check the component ${mockItem.component} has the deploy command. Serverless Devs documents：https://github.com/Serverless-Devs/Serverless-Devs/blob/master/docs/zh/command`
+                    `Please check the component ${mockItem.component} has the deploy command. Serverless Devs documents：https://manual.serverless-devs.com/`
                 );
             });
         });

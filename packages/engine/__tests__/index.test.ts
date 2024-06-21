@@ -332,7 +332,7 @@ test('validate projectName', async () => {
   const context = await engine.start();
   console.log(context);
   expect(get(context, 'error[0]')).toBeInstanceOf(DevsError);
-  expect(get(context, 'error[0].message')).toBe(`The name of the project [deploy] overlaps with a command, please change it's name`);
+  expect(get(context, 'error[0].message')).toBe(`The name of the project [deploy] overlaps with a command, please change it's name.`);
   expect(get(context, 'error[0].code')).toBe('ERR_ASSERTION');
 });
 
