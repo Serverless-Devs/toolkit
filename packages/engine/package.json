@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/engine",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "a engine lib for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -27,6 +27,7 @@
     "@serverless-devs/logger": "workspace:^",
     "@serverless-devs/parse-spec": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
+    "@serverless-devs/load-application": "workspace:^",
     "ajv": "^8.12.0",
     "chalk": "4.x",
     "flatted": "^3.2.7",

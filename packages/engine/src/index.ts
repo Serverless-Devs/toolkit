@@ -14,7 +14,7 @@ import { EXIT_CODE } from './constants';
 import assert from 'assert';
 import Ajv from 'ajv';
 export * from './types';
-export { verify, preview } from './utils';
+export { verify, preview, init } from './utils';
 
 const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 

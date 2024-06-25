@@ -295,8 +295,7 @@ You can still use them now, but we suggest to modify them.`)
       };
       try {
         // Execute the command for the component with the prepared inputs.
-        await instance[command](newInputs);
-        return;
+        return await instance[command](newInputs);
       } catch (e) {
         const error = e as Error;
         // Check if the failure is allowed based on the record's allowFailure setting.
