@@ -9,5 +9,5 @@ export const EXIT_CODE = {
   RUN: 101,
 };
 
-export const INFO_EXP_PATTERN = /\$\{resources\.([^.]+)\.info\.[^}]+}/g;
-export const OUTPUT_EXP_PATTERN = /\$\{resources\.([^.]+)\.output\.[^}]+}/g;
+export const INFO_EXP_PATTERN = /\$\{resources\.([^.{}]+)\.info(\.[^.{}]+)+}/g;
+export const OUTPUT_EXP_PATTERN = /\$\{resources\.([^.{}]+)\.output(\.[^.{}]+)+}/g;
