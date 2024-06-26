@@ -54,6 +54,7 @@ class ParseContent {
         component: item.component,
         props: temp[name].props,
         output: temp[name].output,
+        info: temp[name].info,
       },
     };
     // parse props magic
