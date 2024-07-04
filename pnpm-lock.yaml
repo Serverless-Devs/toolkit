@@ -196,8 +196,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.16-beta.10
-        version: 4.13.16-beta.10
+        specifier: ^4.13.16-beta.12
+        version: 4.13.16-beta.12
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -313,8 +313,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.16-beta.10
-        version: 4.13.16-beta.10
+        specifier: ^4.13.16-beta.12
+        version: 4.13.16-beta.12
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -1119,8 +1119,8 @@ packages:
       - supports-color
     dev: false
 
-  /@serverless-devs/art-template@4.13.16-beta.10:
-    resolution: {integrity: sha512-LXjx3Z9xYyhu1BH447nJiEndNQN27iAjHU8FIjLVtaKgd0D4Z3sPBxJT3CD+UBCW8Gb10TuIdQLT0ZKU44QmaQ==}
+  /@serverless-devs/art-template@4.13.16-beta.12:
+    resolution: {integrity: sha512-hu5Kr/PakpeAMgrvF6do5k6elAP3qbNa6HEJBxTFuRIdxc4HtD6vzbWoje4jYGKAvuSDRrvmxMfpj2YL5TC//w==}
     engines: {node: '>= 1.0.0'}
     dependencies:
       '@serverless-devs/utils': 0.0.14

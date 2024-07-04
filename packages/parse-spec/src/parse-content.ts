@@ -40,14 +40,21 @@ class ParseContent {
   }
   private getMagicProps(item: Partial<IStep>) {
     const resources = get(this.content, 'resources', {});
+    // support ${components.xxx.output}
+    const components = get(this.content, 'components', {});
     const temp = {} as Record<string, any>;
+    const tempCom = {} as Record<string, any>;
     each(resources, (item, key) => {
       set(temp, `${key}.props`, item.props || {});
+    });
+    each(components, (item, key) => {
+      set(tempCom, `${key}.props`, item.props || {});
     });
     const name = item.projectName as string;
     const res = {
       ...this.getCommonMagic(),
       resources: temp,
+      components: tempCom,
       that: {
         name,
         access: item.access,

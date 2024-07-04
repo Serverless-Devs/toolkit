@@ -59,9 +59,11 @@ class Order {
             if (matchResult) {
               for (const item of matchResult) {
                 const newItem = item.replace(REGXG, '$1');
+                const prefix = split(newItem, '.')[0];
                 const projectName = split(newItem, '.')[1];
                 const output = split(newItem, '.')[2];
-                if (includes(projectNameList, projectName) && output === 'output') {
+                // support ${components.xx.output}
+                if (prefix === 'resources' && includes(projectNameList, projectName) && output === 'output') {
                   this.useOrder = true;
                   set(dependencies, topKey, { ...dependencies[topKey], [projectName]: 1 });
                 }

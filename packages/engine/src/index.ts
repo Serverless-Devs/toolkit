@@ -10,7 +10,7 @@ import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
-import { EXIT_CODE, INFO_EXP_PATTERN } from './constants';
+import { EXIT_CODE, INFO_EXP_PATTERN, COMPONENT_EXP_PATTERN } from './constants';
 import assert from 'assert';
 import Ajv from 'ajv';
 export * from './types';
@@ -344,16 +344,23 @@ class Engine {
     const { props } = item;
     const compString = JSON.stringify(props);
     const matches = compString.matchAll(INFO_EXP_PATTERN);
-    const resourceNames = [];
+    const resourceNames = new Set<string>();
     for (const match of matches) {
       if (match[1]) {
-        resourceNames.push(match[1]);
+        resourceNames.add(match[1]);
+      }
+    }
+    // support ${components.xx.output.xx}
+    const comMatches = compString.matchAll(COMPONENT_EXP_PATTERN);
+    for (const match of comMatches) {
+      if (match[1]) {
+        resourceNames.add(match[1]);
       }
     }
     if (isEmpty(resourceNames)) return;
-    const resourcesItems: IStepOptions[] = resourceNames.map((name) => {
+    const resourcesItems: IStepOptions[] = map(Array.from(resourceNames), (name) => {
       return this.context.steps.find((obj) => obj.projectName === name) as IStepOptions;
-    })
+    });
     await Promise.all(map(resourcesItems, async (item) => {
       if (!item) return;
       const projectInfo = get(this.info, item.projectName);
@@ -378,6 +385,7 @@ class Engine {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
       resources: {},
+      components: {},
       __runtime: this.options.verify ? 'engine' : 'parse',
       __steps: this.context.steps,
     } as Record<string, any>;
@@ -387,6 +395,10 @@ class Engine {
         props: obj.props || {}, 
         info: this.info[obj.projectName] || {},
       };
+      // support ${components.xx.output.xx}
+      data.components[obj.projectName] = {
+        output: this.info[obj.projectName] || {},
+      }
     }
     if (item) {
       data.credential = item.credential;
