@@ -73,6 +73,7 @@ export interface IContext {
   error: IEngineError[]; // 记录step的错误信息
   output: Record<string, any>; // 记录step的输出
   credential: Record<string, any>; // 尝试获取到的密钥信息
+  allSteps: IStepOptions[]; // 记录所有step
 }
 
 export type IEngineError = Error | AssertionError | DevsError;

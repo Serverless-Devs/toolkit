@@ -81,6 +81,7 @@ export interface IYaml {
 export type ISpec = IRecord & {
   steps: IStep[];
   yaml: IYaml;
+  allSteps?: IStep[];
 };
 export interface IRecord {
   projectName?: string;

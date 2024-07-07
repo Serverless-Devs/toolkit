@@ -66,10 +66,11 @@ class Engine {
     each(this.options.env, (value, key) => {
       process.env[key] = value;
     });
-    const { steps: _steps } = this.spec;
+    const { steps: _steps, allSteps } = this.spec;
     // 参数校验
     await this.validate();
     this.context.steps = await this.download(_steps);
+    this.context.allSteps = allSteps ? await this.download(allSteps) : [];
   }
 
   /**
@@ -116,6 +117,9 @@ class Engine {
 
     // Assign the id, pending status and etc for all steps.
     this.context.steps = map(this.context.steps, item => {
+      return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENDING, done: false };
+    });
+    this.context.allSteps = map(this.context.allSteps, item => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENDING, done: false };
     });
     const res: IContext = await new Promise(async resolve => {
@@ -359,7 +363,7 @@ class Engine {
     }
     if (isEmpty(resourceNames)) return;
     const resourcesItems: IStepOptions[] = map(Array.from(resourceNames), (name) => {
-      return this.context.steps.find((obj) => obj.projectName === name) as IStepOptions;
+      return this.context.allSteps.find((obj) => obj.projectName === name) as IStepOptions;
     });
     await Promise.all(map(resourcesItems, async (item) => {
       if (!item) return;
@@ -389,7 +393,7 @@ class Engine {
       __runtime: this.options.verify ? 'engine' : 'parse',
       __steps: this.context.steps,
     } as Record<string, any>;
-    for (const obj of this.context.steps) {
+    for (const obj of this.context.allSteps) {
       data.resources[obj.projectName] = { 
         output: obj.output || {}, 
         props: obj.props || {}, 

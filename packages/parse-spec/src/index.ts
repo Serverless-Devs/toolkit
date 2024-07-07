@@ -202,10 +202,10 @@ class ParseSpec {
     // 再次解析参数，比如projectNames
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
-    const { steps, content, originSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
+    const { steps, content, originSteps, allSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
     const services = get(this.yaml.content, 'services', {});
     if (isEmpty(steps) && !isEmpty(services)) {
-      this.options.logger.tips('Check https://manual.serverless-devs.com/user-guide/spec/ for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
+      this.options.logger.tips('Check https://docs.serverless-devs.com/user-guide/spec/ for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
       throw new DevsError(`Keyword 'services' has been replaced by 'resources' in 3.0.0 YAML.`, {
         trackerType: ETrackerType.parseException,
       });
@@ -221,6 +221,7 @@ class ParseSpec {
     const result = {
       steps: this.record.projectName ? steps : this.doFlow(steps, originSteps),
       yaml: this.yaml,
+      allSteps: allSteps,
       ...this.record,
     };
     debug(`parse result: ${JSON.stringify(result)}`);
