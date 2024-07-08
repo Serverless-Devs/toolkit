@@ -1,5 +1,5 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size, cloneDeep } from 'lodash';
+import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size, cloneDeep, find } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
 import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
@@ -394,9 +394,10 @@ class Engine {
       __steps: this.context.steps,
     } as Record<string, any>;
     for (const obj of this.context.allSteps) {
+      const stepItem = find(this.context.steps, (obj2) => obj2.projectName === obj.projectName);
       data.resources[obj.projectName] = { 
-        output: obj.output || {}, 
-        props: obj.props || {}, 
+        output: obj.output || get(stepItem, 'output') || {}, 
+        props: obj.props || get(stepItem, 'props') || {}, 
         info: this.info[obj.projectName] || {},
       };
       // support ${components.xx.output.xx}
