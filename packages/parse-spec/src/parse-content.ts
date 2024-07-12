@@ -2,10 +2,10 @@ import path from 'path';
 import getInputs from './get-inputs';
 import { IStep } from './types';
 import { getCredential } from './utils';
+import { isDevsDebugMode } from '@serverless-devs/utils';
 import { each, get, omit, set, pickBy, cloneDeep, isEmpty, find } from 'lodash';
-const compile = require('@serverless-devs/art-template/lib/devs-compile');
 const extend2 = require('extend2');
-const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
 
 interface IOptions {
   logger?: any;
@@ -83,6 +83,7 @@ class ParseContent {
     const allOriginSteps = [];
     for (const project in resources) {
       const element = resources[project];
+      const compile = require('@serverless-devs/art-template/lib/devs-compile');
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());

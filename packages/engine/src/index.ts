@@ -9,14 +9,14 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
-import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
+import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid, isDevsDebugMode } from '@serverless-devs/utils';
 import { EXIT_CODE, INFO_EXP_PATTERN, COMPONENT_EXP_PATTERN } from './constants';
 import assert from 'assert';
 import Ajv from 'ajv';
 export * from './types';
 export { verify, preview, init } from './utils';
 
-const debug = require('@serverless-cd/debug')('serverless-devs:engine');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:engine') : (i: any) => {};
 
 /**
  * Engine Class

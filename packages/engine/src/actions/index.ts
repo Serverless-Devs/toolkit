@@ -1,7 +1,7 @@
 import { IAction, IActionLevel, IActionType, IAllowFailure, IComponentAction, IHookType, IPluginAction, IRunAction, getInputs } from '@serverless-devs/parse-spec';
 import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
-import { DevsError, ETrackerType } from '@serverless-devs/utils';
+import { DevsError, ETrackerType, isDevsDebugMode } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import { spawn } from 'child_process';
 import loadComponent from '@serverless-devs/load-component';
@@ -12,7 +12,7 @@ import { ILoggerInstance } from '@serverless-devs/logger';
 import { EXIT_CODE } from '../constants';
 import { IStepOptions } from '../types';
 
-const debug = require('@serverless-cd/debug')('serverless-devs:engine');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:engine') : (i: any) => {};
 
 interface IRecord {
   magic: Record<string, any>; // 记录魔法变量
@@ -284,7 +284,7 @@ You can still use them now, but we suggest to modify them.`)
     const [componentName, command] = _;
 
     // Load the specified component.
-    const instance = await loadComponent(componentName, { logger: this.logger });
+    const instance = await loadComponent(componentName, { logger: this.logger, cleanCache: true });
 
     // Check if the specified command exists for the component.
     if (instance[command]) {

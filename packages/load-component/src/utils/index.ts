@@ -2,10 +2,10 @@ import path from 'path';
 import fs from 'fs-extra';
 import { get, includes, find, split, filter, isEmpty } from 'lodash';
 import axios from 'axios';
-import { getRootHome, getYamlContent, registry } from '@serverless-devs/utils';
+import { getRootHome, getYamlContent, registry, isDevsDebugMode } from '@serverless-devs/utils';
 import { BASE_URL } from '../constant';
 import assert from 'assert';
-const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-component') : (i: any) => {};
 const getUrlWithLatest = (name: string) => `${BASE_URL}/packages/${name}/release/latest`;
 const getUrlWithVersion = (name: string, versionId: string) => `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
 
@@ -40,12 +40,14 @@ const getEntryFile = async (componentPath: string) => {
   );
 };
 
-export const buildComponentInstance = async (componentPath: string, params?: any) => {
+export const buildComponentInstance = async (componentPath: string, params?: any, cleanCache: boolean = false) => {
   const requirePath = await getEntryFile(componentPath);
   // bug: `- component: fc invoke` timeout. Delete require cache
-  try {
-    delete require.cache[requirePath];
-  } catch {}
+  if (cleanCache && require.cache[requirePath]) {
+    try {
+      delete require.cache[requirePath];
+    } catch {}
+  }
   const baseChildComponent = await require(requirePath);
 
   const ChildComponent = baseChildComponent.default || baseChildComponent;

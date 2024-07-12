@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
-import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
+import { getYamlContent, registry, isCiCdEnvironment, getYamlPath, isDevsDebugMode } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
@@ -14,7 +14,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray } from './constant';
-const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-appliaction') : (i: any) => {};
 
 class LoadApplication {
   /**
