@@ -1,2 +1,7 @@
 // get local MAC code as crypto key
-// export const CRYPTO_STRING = 
+import { mac } from 'address';
+export const CRYPTO_STRING = mac(function (err, addr) {
+  console.log(addr);
+});
+
+console.log(CRYPTO_STRING);
