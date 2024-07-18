@@ -45,7 +45,7 @@ class ParseContent {
     const temp = {} as Record<string, any>;
     const tempCom = {} as Record<string, any>;
     each(resources, (item, key) => {
-      set(temp, `${key}.props`, item.props || {});
+      set(temp, `${key}`, item || {});
     });
     each(components, (item, key) => {
       set(tempCom, `${key}.props`, item.props || {});
@@ -59,9 +59,7 @@ class ParseContent {
         name,
         access: item.access,
         component: item.component,
-        props: temp[name].props,
-        output: temp[name].output,
-        info: temp[name].info,
+        ...temp[name]
       },
     };
     // parse props magic

@@ -2,6 +2,7 @@ export interface IStep {
   projectName: string;
   component: string;
   props: Record<string, any>;
+  vars?: Record<string, any>;
   actions?: Record<string, any>;
   order: number;
   access: string | undefined;

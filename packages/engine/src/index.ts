@@ -399,6 +399,7 @@ class Engine {
         output: obj.output || get(stepItem, 'output') || {}, 
         props: obj.props || get(stepItem, 'props') || {}, 
         info: this.info[obj.projectName] || {},
+        vars: obj.vars || get(stepItem, 'vars') || {},
       };
       // support ${components.xx.output.xx}
       data.components[obj.projectName] = {
@@ -413,6 +414,7 @@ class Engine {
         component: item.component,
         props: data.resources[item.projectName].props,
         output: data.resources[item.projectName].output,
+        vars: data.resources[item.projectName].vars,
       };
     }
     return data;
