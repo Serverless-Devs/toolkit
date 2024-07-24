@@ -1,6 +1,7 @@
 export { default as getInputs } from './get-inputs';
 export * from './types';
 export * from './contants';
+export { ParseSpecForContent } from './utils';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
