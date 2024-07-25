@@ -1,41 +1,87 @@
-import { mac } from 'address';
+import { one } from 'macaddress';
+import { secretsPath } from './constant';
+import fs from 'fs-extra';
+import jsYaml from 'js-yaml';
+import { getRootHome } from '@serverless-devs/utils';
+const Crypto = require('crypto-js');
 
 class SecretManager {
+  private static instance: SecretManager | null = null;
   private static CRYPTO_STRING: string = '';
-  private static secret: Record<string, any> = {};
+  private secrets: Record<string, any> = {};
 
-  constructor () {
-    if (!SecretManager.CRYPTO_STRING) {
-      mac((err, addr) => {
-        if (err) {
-          throw err;
-        }
-        if (!addr) {
-          throw new Error('mac address not found');
-        }
-        SecretManager.CRYPTO_STRING = addr;
-      });
+  private constructor() {
+    // init secrets
+    this.initSecrets();
+  }
+
+  /**
+   * Init a Secret Manager instance. Use singleton pattern.
+   * @returns Promise<SecretManager>
+   */
+  static async getInstance(): Promise<SecretManager> {
+    if (!this.instance) {
+      await this.initCrypto();
+      this.instance = new SecretManager();
+    }
+    return this.instance;
+  }
+
+  /**
+   * Init crypto string.
+   * @returns Promise<void>
+   */
+  static async initCrypto() {
+    this.CRYPTO_STRING = await one();
+  }
+
+  /**
+   * Init secrets.
+   * @returns void
+   */
+  private initSecrets() {
+    if (fs.pathExistsSync(secretsPath)) {
+      console.log(secretsPath);
+      this.secrets = jsYaml.load(fs.readFileSync(secretsPath, 'utf8')) || {};
+    } else {
+      fs.ensureDirSync(getRootHome());
+      fs.writeFileSync(secretsPath, jsYaml.dump({}));
+      this.secrets = {};
     }
   }
-  private static getCryptoString() {
-    return SecretManager.CRYPTO_STRING;
+
+  /**
+   * Write secrets to file.
+   * @returns void
+   */
+  private writeToFile() {
+    fs.writeFileSync(secretsPath, jsYaml.dump(this.secrets));
   }
-  static getCrypto() {
-    return SecretManager.getCryptoString();
+
+  /**
+   * Add a secret.
+   * @param key
+   * @param value
+   * @returns void
+   */
+  addSecret(key: string, value: string) {
+    // use AES algorithm to encrypt the secret
+    this.secrets[key] = Crypto.AES.encrypt(value, SecretManager.CRYPTO_STRING).toString();
+    this.writeToFile();
   }
-  static getSecrets() {
-    return this.secret;
+
+  /**
+   * Get all secrets.
+   * @returns Record<string, any>
+   */
+  getAllSecrets() {
+    return this.secrets;
   }
-  static initSecrets(secrets: Record<string, any>) {
-    this.secret = secrets;
+
+  getSecret(key: string) {
+    // use AES algorithm to decrypt the secret
+    return Crypto.AES.decrypt(this.secrets[key], SecretManager.CRYPTO_STRING).toString(Crypto.enc.Utf8);
   }
-  static getSecretKeys() {
-    return Object.keys(this.secret);
-  }
-  static getSecret(key: string) {
-    return this.secret[key];
-  }
-  // setSecret(key: string, value: string) {
-  //   secret 
-  // }
 }
+
+export default SecretManager;

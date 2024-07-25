@@ -1,7 +1,4 @@
-// get local MAC code as crypto key
-import { mac } from 'address';
-export const CRYPTO_STRING = mac(function (err, addr) {
-  console.log(addr);
-});
+import { getRootHome } from "@serverless-devs/utils";
+import * as path from 'path';
 
-console.log(CRYPTO_STRING);
+export const secretsPath = path.join(getRootHome(), 'secrets.yaml');
