@@ -90,6 +90,7 @@ class SecretManager {
    */
   getSecret(key: string) {
     // use AES algorithm to decrypt the secret
+    if (!this.secrets[key]) return undefined;
     return Crypto.AES.decrypt(this.secrets[key], SecretManager.CRYPTO_STRING).toString(Crypto.enc.Utf8);
   }
 
