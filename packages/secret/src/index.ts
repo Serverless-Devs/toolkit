@@ -78,9 +78,29 @@ class SecretManager {
     return this.secrets;
   }
 
+  /**
+   * Decrypts the secret using the specified key.
+   * 
+   * This function is designed to retrieve a specific piece of encrypted information based on a given key. It utilizes the AES encryption algorithm to decrypt the data,
+   * ensuring the security of the information. The decryption process involves the use of a predefined encryption string for decryption operations,
+   * and finally converts the decrypted data into a UTF-8 string format for return.
+   * 
+   * @param key The key used to locate the specific encrypted information in the storage.
+   * @returns Returns the decrypted information as a UTF-8 string.
+   */
   getSecret(key: string) {
     // use AES algorithm to decrypt the secret
     return Crypto.AES.decrypt(this.secrets[key], SecretManager.CRYPTO_STRING).toString(Crypto.enc.Utf8);
+  }
+
+  /**
+   * Delete a secret.
+   * @param key
+   * @returns void
+   */
+  deleteSecret(key: string) {
+    delete this.secrets[key];
+    this.writeToFile();
   }
 }
 
