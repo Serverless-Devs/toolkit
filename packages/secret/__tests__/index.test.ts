@@ -17,4 +17,10 @@ describe('SecretManager', () => {
     manager.addSecret('test', 'test');
     expect(manager.getSecret('test')).toBe('test');
   });
+  it('should delete secret', async () => {
+    const manager = await SecretManager.getInstance();
+    manager.addSecret('test', 'test');
+    manager.deleteSecret('test');
+    expect(manager.getSecret('test')).toBeUndefined();
+  });
 });
