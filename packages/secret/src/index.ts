@@ -41,7 +41,6 @@ class SecretManager {
    */
   private initSecrets() {
     if (fs.pathExistsSync(secretsPath)) {
-      console.log(secretsPath);
       this.secrets = jsYaml.load(fs.readFileSync(secretsPath, 'utf8')) || {};
     } else {
       fs.ensureDirSync(getRootHome());
