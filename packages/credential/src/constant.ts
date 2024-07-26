@@ -1,6 +1,5 @@
 import path from 'path';
 import os from 'os';
-import * as setType from './actions/set/type';
 
 const Crypto = require('crypto-js');
 

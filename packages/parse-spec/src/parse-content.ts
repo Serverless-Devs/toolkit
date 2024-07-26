@@ -2,10 +2,10 @@ import path from 'path';
 import getInputs from './get-inputs';
 import { IStep } from './types';
 import { getCredential } from './utils';
-import { each, get, omit, set, pickBy, cloneDeep, isEmpty } from 'lodash';
-const compile = require('@serverless-devs/art-template/lib/devs-compile');
+import { isDevsDebugMode } from '@serverless-devs/utils';
+import { each, get, omit, set, pickBy, cloneDeep, isEmpty, find } from 'lodash';
 const extend2 = require('extend2');
-const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
 
 interface IOptions {
   logger?: any;
@@ -40,20 +40,26 @@ class ParseContent {
   }
   private getMagicProps(item: Partial<IStep>) {
     const resources = get(this.content, 'resources', {});
+    // support ${components.xxx.output}
+    const components = get(this.content, 'components', {});
     const temp = {} as Record<string, any>;
+    const tempCom = {} as Record<string, any>;
     each(resources, (item, key) => {
-      set(temp, `${key}.props`, item.props || {});
+      set(temp, `${key}`, item || {});
+    });
+    each(components, (item, key) => {
+      set(tempCom, `${key}.props`, item.props || {});
     });
     const name = item.projectName as string;
     const res = {
       ...this.getCommonMagic(),
       resources: temp,
+      components: tempCom,
       that: {
         name,
         access: item.access,
         component: item.component,
-        props: temp[name].props,
-        output: temp[name].output,
+        ...temp[name]
       },
     };
     // parse props magic
@@ -70,12 +76,12 @@ class ParseContent {
       ...this.content,
       ...getInputs(rest, this.getCommonMagic()),
     };
-    const steps = [];
-    const originSteps = [];
-    // projectName 存在，说明指定了项目
-    const temp = this.options.projectName ? { [this.options.projectName]: resources[this.options.projectName] } : resources;
-    for (const project in temp) {
+    // support resources.info, all steps are needed
+    const allSteps = [];
+    const allOriginSteps = [];
+    for (const project in resources) {
       const element = resources[project];
+      const compile = require('@serverless-devs/art-template/lib/devs-compile');
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
       template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
@@ -106,14 +112,14 @@ class ParseContent {
           [project]: real,
         },
       };
-      steps.push({
+      allSteps.push({
         ...real,
         projectName: project,
         component,
         access,
         credential: this.credential,
       });
-      originSteps.push({
+      allOriginSteps.push({
         ...element,
         projectName: project,
         component,
@@ -121,7 +127,10 @@ class ParseContent {
         credential: this.credential,
       });
     }
-    return { steps, content: this.content, originSteps };
+    // projectName 存在，说明指定了项目
+    const steps = this.options.projectName ? [find(allSteps, (item) => item.projectName === this.options.projectName)] : allSteps;
+    const originSteps = this.options.projectName ? [find(allOriginSteps, (item) => item.projectName === this.options.projectName)] : allOriginSteps;
+    return { steps, content: this.content, originSteps, allSteps };
   }
   private getAccess() {
     // 全局的 -a > env.yaml 的 access > s.yaml 的 access > default

@@ -2,19 +2,19 @@ import fs from 'fs-extra';
 import { buildComponentInstance, getProvider, getZipballUrl, getComponentCachePath } from './utils';
 import download from '@serverless-devs/downloads';
 import { get } from 'lodash';
-import { readJson, registry, getLockFile } from '@serverless-devs/utils';
+import { readJson, registry, getLockFile, isDevsDebugMode } from '@serverless-devs/utils';
 import assert from 'assert';
 import semver from 'semver';
-const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-component') : (i: any) => {};
 
 export class Component {
-  constructor(private name: string, private params: Record<string, any> = {}) {
+  constructor(private name: string, private params: Record<string, any> = {}, private cleanCache: boolean = false) {
     assert(name, 'component name is required');
   }
   async run() {
     // 本地路径
     if (fs.existsSync(this.name)) {
-      return await buildComponentInstance(this.name, this.params);
+      return await buildComponentInstance(this.name, this.params, this.cleanCache);
     }
     return await this.getDevComponent();
   }
@@ -50,7 +50,7 @@ export class Component {
     debug(`componentCachePath: ${componentCachePath}`);
     const lockPath = getLockFile(componentCachePath);
     if (fs.existsSync(lockPath)) {
-      return await buildComponentInstance(componentCachePath, this.params);
+      return await buildComponentInstance(componentCachePath, this.params, this.cleanCache);
     }
     const { zipballUrl = componentName, version = componentVersion } = await getZipballUrl(componentName, componentVersion);
     debug(`zipballUrl: ${zipballUrl}`);
@@ -62,12 +62,13 @@ export class Component {
       headers: registry.getSignHeaders(),
     });
     fs.writeFileSync(lockPath, JSON.stringify({ version, lastUpdateCheck: Date.now() }));
-    return await buildComponentInstance(componentCachePath, this.params);
+    return await buildComponentInstance(componentCachePath, this.params, this.cleanCache);
   }
 }
 
 const loadComponent = async (name: string, params?: Record<string, any>) => {
-  return await new Component(name, params).run();
+  const { cleanCache, ...rest } = params || { cleanCache: false };
+  return await new Component(name, rest, cleanCache).run();
 };
 
 export default loadComponent;

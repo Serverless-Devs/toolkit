@@ -18,3 +18,4 @@ export { default as readJson } from './read-json';
 export { default as emoji } from './emoji';
 export const getLockFile = (basePath: string) => path.join(basePath, '.s.lock');
 export { default as getUserAgent } from './get-user-agent';
+export { default as isDevsDebugMode } from './is-devs-debug-mode';

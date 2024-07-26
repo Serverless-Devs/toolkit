@@ -3,19 +3,18 @@ import fs from 'fs-extra';
 import axios from 'axios';
 import download from '@serverless-devs/downloads';
 import artTemplate from 'art-template';
-import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
+import { getYamlContent, isCiCdEnvironment, getYamlPath, isDevsDebugMode } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, find, startsWith } from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, REGISTRY } from './constant';
-import { getInputs, getAllCredential, getDefaultValue } from './utils';
-import YAML from 'yaml';
+import { getAllCredential, getDefaultValue } from './utils';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
-import { gray, RANDOM_PATTERN } from './constant';
+import { gray } from './constant';
 import assert from 'assert';
-const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-application') : (i: any) => {};
 
 class LoadApplication {
   private provider: `${IProvider}`;
@@ -163,7 +162,6 @@ class LoadApplication {
     const hookPath = path.join(this.tempPath, 'hook');
     if (!fs.existsSync(hookPath)) return;
     const { logger } = this.options;
-    const { parameters, access } = this.options;
     const hook = await require(hookPath);
     const data = {
       provider: this.provider,

@@ -1,7 +1,8 @@
 import { includes, map, split, set, sortBy, isEmpty, get, cloneDeep, unset, isObject } from 'lodash';
 import { REGXG } from './contants';
 import { IStep } from './types';
-const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
+import { isDevsDebugMode } from '@serverless-devs/utils';
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
 
 class Order {
   private useOrder = false; // 是否使用分析出来的order
@@ -59,8 +60,11 @@ class Order {
             if (matchResult) {
               for (const item of matchResult) {
                 const newItem = item.replace(REGXG, '$1');
+                const prefix = split(newItem, '.')[0];
                 const projectName = split(newItem, '.')[1];
-                if (includes(projectNameList, projectName)) {
+                const output = split(newItem, '.')[2];
+                // support ${components.xx.output}
+                if (prefix === 'resources' && includes(projectNameList, projectName) && output === 'output') {
                   this.useOrder = true;
                   set(dependencies, topKey, { ...dependencies[topKey], [projectName]: 1 });
                 }

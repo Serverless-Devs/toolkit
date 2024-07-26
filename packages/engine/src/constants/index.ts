@@ -8,3 +8,7 @@ export const EXIT_CODE = {
   // shell 执行错误
   RUN: 101,
 };
+
+export const INFO_EXP_PATTERN = /\$\{resources\.([^.{}]+)\.info(\.[^.{}]+)+}/g;
+export const COMPONENT_EXP_PATTERN = /\$\{components\.([^.{}]+)\.output(\.[^.{}]+)+}/g;
+export const OUTPUT_EXP_PATTERN = /\$\{resources\.([^.{}]+)\.output(\.[^.{}]+)+}/g;

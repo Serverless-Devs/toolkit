@@ -4,7 +4,8 @@ import assert from 'assert';
 import { IOptions } from './types';
 import { includes, get } from 'lodash';
 import { REGISTRY } from './constant';
-const debug = require('@serverless-cd/debug')('serverless-devs:load-appliaction');
+import { isDevsDebugMode } from '@serverless-devs/utils';
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-application') : (i: any) => {};
 
 export default async (template: string, options: IOptions = {}) => {
   debug(`load application, template: ${template}, options: ${JSON.stringify(options)}`);

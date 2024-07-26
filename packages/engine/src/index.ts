@@ -1,5 +1,5 @@
 import { createMachine, interpret } from 'xstate';
-import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size } from 'lodash';
+import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size, cloneDeep, find } from 'lodash';
 import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
 import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
@@ -9,14 +9,14 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
-import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
-import { EXIT_CODE } from './constants';
+import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid, isDevsDebugMode } from '@serverless-devs/utils';
+import { EXIT_CODE, INFO_EXP_PATTERN, COMPONENT_EXP_PATTERN } from './constants';
 import assert from 'assert';
 import Ajv from 'ajv';
 export * from './types';
 export { verify, preview, init } from './utils';
 
-const debug = require('@serverless-cd/debug')('serverless-devs:engine');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:engine') : (i: any) => {};
 
 /**
  * Engine Class
@@ -38,6 +38,7 @@ class Engine {
   private parseSpecInstance!: ParseSpec;
   private globalActionInstance!: Actions; // 全局的 action
   private actionInstance!: Actions; // 项目的 action
+  private info: Record<string, any> = {}; // 存储全局变量
 
   constructor(private options: IEngineOptions) {
     debug('engine start');
@@ -65,10 +66,11 @@ class Engine {
     each(this.options.env, (value, key) => {
       process.env[key] = value;
     });
-    const { steps: _steps } = this.spec;
+    const { steps: _steps, allSteps } = this.spec;
     // 参数校验
     await this.validate();
     this.context.steps = await this.download(_steps);
+    this.context.allSteps = allSteps ? await this.download(allSteps) : [];
   }
 
   /**
@@ -103,7 +105,7 @@ class Engine {
     this.context.credential = credential;
     // 处理 global-pre
     try {
-      this.globalActionInstance.setValue('magic', this.getFilterContext());
+      this.globalActionInstance.setValue('magic', await this.getFilterContext());
       this.globalActionInstance.setValue('command', command);
       await this.globalActionInstance.start(IHookType.PRE, { access, credential });
     } catch (error) {
@@ -115,6 +117,9 @@ class Engine {
 
     // Assign the id, pending status and etc for all steps.
     this.context.steps = map(this.context.steps, item => {
+      return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENDING, done: false };
+    });
+    this.context.allSteps = map(this.context.allSteps, item => {
       return { ...item, stepCount: uniqueId(), status: STEP_STATUS.PENDING, done: false };
     });
     const res: IContext = await new Promise(async resolve => {
@@ -330,20 +335,76 @@ class Engine {
   }
 
   /**
+   * 20240624 New feature
+   * ${resources.xx.info.xx} read from `info` command's output.
+   * This function will check current step content to determine 
+   * whether to execute `info` command of a certain resource.
+   * 
+   * @param item - The current step being processed.
+   * @returns
+   */
+  private async getInfo(item: IStepOptions | undefined) {
+    if (!item) return;
+    const { props } = item;
+    const compString = JSON.stringify(props);
+    const matches = compString.matchAll(INFO_EXP_PATTERN);
+    const resourceNames = new Set<string>();
+    for (const match of matches) {
+      if (match[1]) {
+        resourceNames.add(match[1]);
+      }
+    }
+    // support ${components.xx.output.xx}
+    const comMatches = compString.matchAll(COMPONENT_EXP_PATTERN);
+    for (const match of comMatches) {
+      if (match[1]) {
+        resourceNames.add(match[1]);
+      }
+    }
+    if (isEmpty(resourceNames)) return;
+    const resourcesItems: IStepOptions[] = map(Array.from(resourceNames), (name) => {
+      return this.context.allSteps.find((obj) => obj.projectName === name) as IStepOptions;
+    });
+    await Promise.all(map(resourcesItems, async (item) => {
+      if (!item) return;
+      const projectInfo = get(this.info, item.projectName);
+      if (!projectInfo || isEmpty(projectInfo) || isNil(projectInfo)) {
+        this.logger.write(`${chalk.gray(`execute info command of [${item.projectName}]...`)}`);
+        const spec = cloneDeep(this.spec);
+        spec['command'] = 'info';
+        const res: any = await this.doSrc(item, {}, spec);
+        set(this.info, item.projectName, res);
+        this.logger.write(`${chalk.gray(`[${item.projectName}] info command executed.`)}`);
+      }
+    }));
+  }
+  /**
    * Generates a context data for the given step containing details like cwd, vars, and other steps' outputs and props.
    * @param item - The current step being processed.
    * @returns - The generated context data.
    */
-  private getFilterContext(item?: IStepOptions) {
+  private async getFilterContext(item?: IStepOptions) {
+    await this.getInfo(item);
     const data = {
       cwd: path.dirname(this.spec.yaml.path),
       vars: this.spec.yaml.vars,
       resources: {},
+      components: {},
       __runtime: this.options.verify ? 'engine' : 'parse',
       __steps: this.context.steps,
     } as Record<string, any>;
-    for (const obj of this.context.steps) {
-      data.resources[obj.projectName] = { output: obj.output || {}, props: obj.props || {} };
+    for (const obj of this.context.allSteps) {
+      const stepItem = find(this.context.steps, (obj2) => obj2.projectName === obj.projectName);
+      data.resources[obj.projectName] = { 
+        output: obj.output || get(stepItem, 'output') || {}, 
+        props: obj.props || get(stepItem, 'props') || {}, 
+        info: this.info[obj.projectName] || {},
+        vars: obj.vars || get(stepItem, 'vars') || {},
+      };
+      // support ${components.xx.output.xx}
+      data.components[obj.projectName] = {
+        output: this.info[obj.projectName] || {},
+      }
     }
     if (item) {
       data.credential = item.credential;
@@ -353,6 +414,7 @@ class Engine {
         component: item.component,
         props: data.resources[item.projectName].props,
         output: data.resources[item.projectName].output,
+        vars: data.resources[item.projectName].vars,
       };
     }
     return data;
@@ -419,7 +481,7 @@ class Engine {
       // project success hook
       try {
         // 项目的output, 再次获取魔法变量
-        this.actionInstance.setValue('magic', this.getFilterContext(item));
+        this.actionInstance.setValue('magic', await this.getFilterContext(item));
         const res = await this.actionInstance?.start(IHookType.SUCCESS, {
           ...this.record.componentProps,
           output: get(item, 'output', {}),
@@ -488,7 +550,7 @@ class Engine {
       });
 
       // Set values for the action instance.
-      this.actionInstance.setValue('magic', this.getFilterContext(item));
+      this.actionInstance.setValue('magic', await this.getFilterContext(item));
       this.actionInstance.setValue('step', item);
       this.actionInstance.setValue('command', command);
 
@@ -559,7 +621,7 @@ class Engine {
    * @returns An object containing properties related to the project step.
    */
   private async getProps(item: IStepOptions) {
-    const magic = this.getFilterContext(item);
+    const magic = await this.getFilterContext(item);
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
     const { projectName, command } = this.spec;
@@ -595,9 +657,9 @@ class Engine {
    * @param data - Additional data which may contain plugin output.
    * @returns Result of the executed action, if applicable.
    */
-  private async doSrc(item: IStepOptions, data: Record<string, any> = {}) {
+  private async doSrc(item: IStepOptions, data: Record<string, any> = {}, spec = this.spec) {
     // Extract command and projectName from the specification.
-    const { command = '', projectName, yaml } = this.spec;
+    const { command = '', projectName, yaml } = spec;
 
     // Retrieve properties for the given project step.
     const newInputs = await this.getProps(item);

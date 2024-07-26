@@ -2,6 +2,7 @@ export interface IStep {
   projectName: string;
   component: string;
   props: Record<string, any>;
+  vars?: Record<string, any>;
   actions?: Record<string, any>;
   order: number;
   access: string | undefined;
@@ -81,6 +82,7 @@ export interface IYaml {
 export type ISpec = IRecord & {
   steps: IStep[];
   yaml: IYaml;
+  allSteps?: IStep[];
 };
 export interface IRecord {
   projectName?: string;

@@ -1,22 +1,22 @@
 export { default as getInputs } from './get-inputs';
 export * from './types';
 export * from './contants';
+export { ParseSpecForContent } from './utils';
 import * as utils from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import path from 'path';
 import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { getDefaultYamlPath, isExtendMode } from './utils';
-const compile = require('@serverless-devs/art-template/lib/devs-compile');
 import Order from './order';
 import ParseContent from './parse-content';
 import { each, filter, find, get, has, includes, isArray, isEmpty, isString, keys, map, set, split } from 'lodash';
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
 import assert from 'assert';
-import { DevsError, ETrackerType } from '@serverless-devs/utils';
+import { DevsError, ETrackerType, isDevsDebugMode } from '@serverless-devs/utils';
 const extend2 = require('extend2');
-const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
+const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
 
 interface IOptions {
   argv?: string[];
@@ -202,10 +202,10 @@ class ParseSpec {
     // 再次解析参数，比如projectNames
     this.parseArgv();
     if (!this.yaml.use3x) return this.v1();
-    const { steps, content, originSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
+    const { steps, content, originSteps, allSteps } = await new ParseContent(this.yaml.content, this.getParsedContentOptions(this.yaml.path)).start();
     const services = get(this.yaml.content, 'services', {});
     if (isEmpty(steps) && !isEmpty(services)) {
-      this.options.logger.tips('Check https://manual.serverless-devs.com/user-guide/spec/ for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
+      this.options.logger.tips('Check https://docs.serverless-devs.com/user-guide/spec/ for more details. Use the \'s cli fc3 s2tos3\' command for automatic YAML transformation.');
       throw new DevsError(`Keyword 'services' has been replaced by 'resources' in 3.0.0 YAML.`, {
         trackerType: ETrackerType.parseException,
       });
@@ -221,6 +221,7 @@ class ParseSpec {
     const result = {
       steps: this.record.projectName ? steps : this.doFlow(steps, originSteps),
       yaml: this.yaml,
+      allSteps: allSteps,
       ...this.record,
     };
     debug(`parse result: ${JSON.stringify(result)}`);
@@ -300,6 +301,7 @@ class ParseSpec {
   private matchFlow(flow: string) {
     const useMagic = REGX.test(flow);
     if (useMagic) {
+      const compile = require('@serverless-devs/art-template/lib/devs-compile');
       return compile(flow, { command: this.record.command });
     }
     return flow === this.record.command;
@@ -363,6 +365,7 @@ class ParseSpec {
   private matchAction(action: string) {
     const useMagic = REGX.test(action);
     if (useMagic) {
+      const compile = require('@serverless-devs/art-template/lib/devs-compile');
       const newAction = compile(action, { command: this.record.command });
       const [type, command] = split(newAction, '-');
       return {

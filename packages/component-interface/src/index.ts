@@ -21,4 +21,5 @@ export interface IInputs {
   args: string[];
   cwd: string;
   outputs?: Record<string, any>;
+  output?: Record<string, any>; // 当前步骤输出
 }
