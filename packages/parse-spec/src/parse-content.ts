@@ -63,7 +63,7 @@ class ParseContent {
       },
     };
     // parse props magic
-    set(res, 'that.props', getInputs(temp[name].props, res));
+    set(res, 'that.props', getInputs(temp[name].props, res, this.options));
     debug(`getMagicProps: ${JSON.stringify(res)}`);
     return res;
   }
@@ -74,7 +74,7 @@ class ParseContent {
     const { resources, ...rest } = this.content;
     this.content = {
       ...this.content,
-      ...getInputs(rest, this.getCommonMagic()),
+      ...getInputs(rest, this.getCommonMagic(), this.options),
     };
     // support resources.info, all steps are needed
     const allSteps = [];
@@ -84,7 +84,7 @@ class ParseContent {
       const compile = require('@serverless-devs/art-template/lib/devs-compile');
       const component = compile(get(element, 'component'), this.getCommonMagic());
       let template = get(this.content.template, get(element, 'extend.name'), {});
-      template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic());
+      template = getInputs(omit(template, get(element, 'extend.ignore', [])), this.getCommonMagic(), this.options);
 
       // 先对env.yaml解析并覆盖
       const source = extend2(true, {}, template, element.props); // 修改target为source
@@ -96,14 +96,14 @@ class ParseContent {
       if (filteredEnv && !isEmpty(get(filteredEnv, 'overlays.resources'))) {
         filteredEnv.overlays.resources = pickBy(filteredEnv.overlays.resources, (value, key) => key === project);
       }
-      const environment = getInputs(filteredEnv, this.getEnvMagic({ source }));
+      const environment = getInputs(filteredEnv, this.getEnvMagic({ source }), this.options);
       const region = get(environment, 'infraStack.region') ? { region: get(environment, 'infraStack.region') } : {};
       debug(`real environment: ${JSON.stringify(environment)}`);
       // 覆盖的优先级：resources > components > s.yaml
       set(element, 'props', extend2(true, {}, source, get(environment, `overlays.components.${component}`, {}), get(environment, `overlays.resources.${project}`, {}), region));
 
       // 解析s.yaml
-      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }));
+      const real = getInputs(element, this.getMagicProps({ projectName: project, access, component }), this.options);
       this.content = {
         ...this.content,
         access,

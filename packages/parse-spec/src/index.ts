@@ -21,6 +21,7 @@ const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-de
 interface IOptions {
   argv?: string[];
   logger?: any;
+  isPreview?: boolean;
 }
 
 class ParseSpec {
@@ -29,6 +30,7 @@ class ParseSpec {
   constructor(filePath: string = '', private options: IOptions = {}) {
     this.options.argv = this.options.argv || process.argv.slice(2);
     this.options.logger = this.options.logger || console;
+    this.options.isPreview = this.options.isPreview || false;
     this.init(filePath);
     debug(`yaml path: ${this.yaml.path}`);
     debug(`argv: ${JSON.stringify(this.options.argv)}`);
@@ -190,6 +192,7 @@ class ParseSpec {
       projectName: this.record.projectName,
       access: this.record.access,
       environment: this.yaml.environment,
+      isPreview: this.options.isPreview,
     };
   }
   async start(): Promise<ISpec> {
