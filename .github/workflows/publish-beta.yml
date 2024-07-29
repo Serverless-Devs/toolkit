@@ -58,7 +58,7 @@ jobs:
         if git diff HEAD^ HEAD --name-only | grep -q "${PACKAGE_JSON}"; then
           echo "Publishing ${{ matrix.package }}..."
           cd $PACKAGE_DIR
-          npm run pub
+          pnpm publish --tag=beta --no-git-checks
         else
           echo "No changes in ${{ matrix.package }}/package.json"
         fi
