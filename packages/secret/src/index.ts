@@ -44,6 +44,34 @@ class SecretManager {
   }
 
   /**
+   * Utilizes the AES encryption algorithm to encrypt a provided string.
+   * 
+   * This static method serves as a utility function designed to simplify the process of string encryption.
+   * It leverages the AES encryption algorithm from the CryptoJS library, combined with a predefined encryption key,
+   * ensuring consistency and security in the encryption process.
+   * 
+   * @param value The string to be encrypted.
+   * @returns Returns the encrypted string. Note that the encrypted string is represented in base64 format.
+   */
+  static encrypt = (value: string) => {
+    return Crypto.AES.encrypt(value, SecretManager.CRYPTO_STRING).toString();
+  }
+
+  /**
+   * Decrypts a given string.
+   * 
+   * This function decrypts the provided string using the AES encryption algorithm. 
+   * It leverages the AES decryption functionality provided by the CryptoJS library,
+   * and relies on the CRYPTO_STRING defined in SecretManager as the decryption key.
+   * 
+   * @param value The string to be decrypted, which should be the result of encryption with the same key.
+   * @returns The original string after decryption.
+   */
+  static decrypt = (value: string) => {
+    return Crypto.AES.decrypt(value, SecretManager.CRYPTO_STRING).toString(Crypto.enc.Utf8);
+  }
+
+  /**
    * Init secrets.
    * @returns void
    */
