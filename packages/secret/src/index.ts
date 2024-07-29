@@ -1,4 +1,4 @@
-import { one } from 'macaddress';
+import { networkInterfaces } from 'macaddress';
 import { secretsPath } from './constant';
 import fs from 'fs-extra';
 import jsYaml from 'js-yaml';
@@ -19,9 +19,9 @@ class SecretManager {
    * Init a Secret Manager instance. Use singleton pattern.
    * @returns Promise<SecretManager>
    */
-  static async getInstance(): Promise<SecretManager> {
+  static getInstance(): SecretManager {
     if (!this.instance) {
-      await this.initCrypto();
+      this.initCrypto();
       this.instance = new SecretManager();
     }
     return this.instance;
@@ -31,8 +31,16 @@ class SecretManager {
    * Init crypto string.
    * @returns Promise<void>
    */
-  static async initCrypto() {
-    this.CRYPTO_STRING = await one();
+  static initCrypto() {
+    // DANGEROUS: default crypto string 
+    let crypto = 'key123';
+    const allNetInfo = networkInterfaces();
+    if (Object.keys(allNetInfo).length > 0) {
+      const firstInterface = Object.keys(allNetInfo)[0];
+      const mac = allNetInfo[firstInterface].mac;
+      crypto = mac;
+    }
+    this.CRYPTO_STRING = crypto;
   }
 
   /**
