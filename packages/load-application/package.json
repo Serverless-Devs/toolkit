@@ -1,6 +1,6 @@
 {
   "name": "@serverless-devs/load-application",
-  "version": "0.0.14-beta.5",
+  "version": "0.0.14-beta.6",
   "description": "load application for serverless-devs",
   "main": "lib/index.js",
   "scripts": {
@@ -18,10 +18,11 @@
   },
   "dependencies": {
     "@serverless-cd/debug": "^4.3.4",
-    "@serverless-devs/art-template": "^4.13.16-beta.12",
+    "@serverless-devs/art-template": "^4.13.16-beta.17",
     "@serverless-devs/credential": "workspace:^",
     "@serverless-devs/downloads": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
+    "@serverless-devs/secret": "workspace:^",
     "art-template": "^4.13.2",
     "axios": "^1.6.0",
     "chalk": "^4.1.2",

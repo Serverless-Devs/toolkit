@@ -8,7 +8,7 @@ import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, sta
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue } from './utils';
+import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue, getSecretManager } from './utils';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -343,6 +343,13 @@ class LoadApplication {
       const ele = properties[key];
       if (has(parameters, key)) {
         set(data, key, parameters[key]);
+      } else if (ele.type === 'secret') {
+        // support ${secret()}
+        set(data, key, `\${secret('${key}')`);
+        if (ele.hasOwnProperty('default') && getDefaultValue(ele.default)) { 
+          const manager = getSecretManager();
+          manager.addSecret(key, getDefaultValue(ele.default) as string);
+        }
       } else if (ele.hasOwnProperty('default')) {
         set(data, key, getDefaultValue(ele.default));
       } else if (includes(requiredList, key)) {
@@ -385,6 +392,7 @@ class LoadApplication {
           'User-Agent': 'Serverless-Devs (https://github.com/Serverless-Devs/Serverless-Devs)',
           ...registry.getSignHeaders(),
           devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
+          use_oss_internal_endpoint: this.options.inner ? 'true' : 'false',
         },
         // use final element as filename
         filename: split(this.name, '/')[-1],
@@ -395,7 +403,7 @@ class LoadApplication {
       if (startsWith(zipball_url, 'https')) {
         logger.debug('https error, try http');
         const newZipballUrl = zipball_url.replace('https://', 'http://');
-        await download(zipball_url, {
+        await download(newZipballUrl, {
           dest: this.tempPath,
           logger,
           extract: true,

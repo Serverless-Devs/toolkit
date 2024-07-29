@@ -9,6 +9,7 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
+import SecretManager from '@serverless-devs/secret';
 import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid, isDevsDebugMode } from '@serverless-devs/utils';
 import { EXIT_CODE, INFO_EXP_PATTERN, COMPONENT_EXP_PATTERN } from './constants';
 import assert from 'assert';
@@ -39,6 +40,7 @@ class Engine {
   private globalActionInstance!: Actions; // 全局的 action
   private actionInstance!: Actions; // 项目的 action
   private info: Record<string, any> = {}; // 存储全局变量
+  private secretManager!: SecretManager; // 敏感参数管理
 
   constructor(private options: IEngineOptions) {
     debug('engine start');
@@ -56,6 +58,14 @@ class Engine {
     // 初始化 logger
     this.glog = this.getLogger() as Logger;
     this.logger = this.glog.__generate('engine');
+    // 初始化 secretManager
+    this.secretManager = SecretManager.getInstance();
+    // 加密所有敏感值
+    const secrets = this.secretManager.getAllSecrets();
+    for (const i of keys(secrets)) {
+      this.glog.__setSecret([i, secrets[i]]);
+      this.glog.__setSecret([i, this.secretManager.getSecret(i)]);
+    }
     // 初始化 spec
     this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), {
       argv: this.options.args,

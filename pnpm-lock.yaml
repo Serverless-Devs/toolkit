@@ -152,6 +152,9 @@ importers:
       '@serverless-devs/parse-spec':
         specifier: workspace:^
         version: link:../parse-spec
+      '@serverless-devs/secret':
+        specifier: workspace:^
+        version: link:../secret
       '@serverless-devs/utils':
         specifier: workspace:^
         version: link:../utils
@@ -196,14 +199,17 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.16-beta.12
-        version: 4.13.16-beta.12
+        specifier: ^4.13.16-beta.17
+        version: 4.13.16-beta.17
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
       '@serverless-devs/downloads':
         specifier: workspace:^
         version: link:../downloads
+      '@serverless-devs/secret':
+        specifier: workspace:^
+        version: link:../secret
       '@serverless-devs/utils':
         specifier: workspace:^
         version: link:../utils
@@ -313,8 +319,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.16-beta.12
-        version: 4.13.16-beta.12
+        specifier: ^4.13.16-beta.17
+        version: 4.13.16-beta.17
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -1143,10 +1149,11 @@ packages:
       - supports-color
     dev: false
 
-  /@serverless-devs/art-template@4.13.16-beta.12:
-    resolution: {integrity: sha512-hu5Kr/PakpeAMgrvF6do5k6elAP3qbNa6HEJBxTFuRIdxc4HtD6vzbWoje4jYGKAvuSDRrvmxMfpj2YL5TC//w==}
+  /@serverless-devs/art-template@4.13.16-beta.17:
+    resolution: {integrity: sha512-kHpPUcGxntX9uQ6zA6oUX/2xp2ph2jyuQXi948dwF63H7i97HKjk8xHCGBfvlDuRKT/NNHBsaSV9AGV0bTXhpw==}
     engines: {node: '>= 1.0.0'}
     dependencies:
+      '@serverless-devs/secret': 0.0.2-beta.4
       '@serverless-devs/utils': 0.0.14
       acorn: 5.7.4
       escodegen: 1.14.3
@@ -1185,8 +1192,29 @@ packages:
       progress: 2.0.3
     dev: false
 
+  /@serverless-devs/secret@0.0.2-beta.4:
+    resolution: {integrity: sha512-gVeECaLEY2mqoHxA/A+nqm3Ko2ABFDHnWUPGMMWRp9fo1wBBDY6gSjBEGI384fb1t31LKpLnWE11UpyokKft7Q==}
+    dependencies:
+      '@serverless-devs/utils': 0.0.16-beta.1
+      address: 2.0.3
+      crypto-js: 4.2.0
+      fs-extra: 11.1.1
+      js-yaml: 4.1.0
+      macaddress: 0.5.3
+    dev: false
+
   /@serverless-devs/utils@0.0.14:
     resolution: {integrity: sha512-E+vlcgwdIeRrSb2z20fD8jOANMyHrzS6mHJFwiAv6eKJX0UuH1um3dKqlrYwpjKzamERs4pT4IzGp/KB7jgXfw==}
+    dependencies:
+      js-yaml: 4.1.0
+      lodash: 4.17.21
+      md5: 2.3.0
+      minimist: 1.2.8
+      random-string: 0.2.0
+    dev: false
+
+  /@serverless-devs/utils@0.0.16-beta.1:
+    resolution: {integrity: sha512-3wft0uB87SYf5GUn9mA+WVnFaMynl88C1LihGyl5tNcd7MS+TVMHWXfUs8k3VwoAVaMDQkU8dkIL9GOl+NKJHQ==}
     dependencies:
       js-yaml: 4.1.0
       lodash: 4.17.21
