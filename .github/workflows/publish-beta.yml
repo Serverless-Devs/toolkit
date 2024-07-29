@@ -3,7 +3,7 @@ name: Publish Packages
 on:
   push:
     branches:
-      - dev-secret
+      - zxy/dev-secret
     paths:
       - 'packages/*/package.json'
 
