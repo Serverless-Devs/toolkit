@@ -392,7 +392,7 @@ class LoadApplication {
           'User-Agent': 'Serverless-Devs (https://github.com/Serverless-Devs/Serverless-Devs)',
           ...registry.getSignHeaders(),
           devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
-          use_oss_internal_endpoint: this.options.inner ? 'true' : 'false',
+          // use_oss_internal_endpoint: this.options.inner ? 'true' : 'false',
         },
         // use final element as filename
         filename: split(this.name, '/')[-1],
