@@ -51,6 +51,7 @@ const extend2 = require('extend2');
 interface IOptions {
   argv?: string[];
   logger?: any;
+  isPreview?: boolean;
 }
 
 export class ParseSpecForContent {
@@ -61,6 +62,7 @@ export class ParseSpecForContent {
     this.options.logger = this.options.logger || console;
     this.yaml.path = '';
     this.yaml.content = jsYaml.load(yamlContent) || {};
+    this.options.isPreview = this.options.isPreview || false;
   }
   private async doYamlinit() {
     await this.doExtend();
@@ -208,6 +210,7 @@ export class ParseSpecForContent {
       projectName: this.record.projectName,
       access: this.record.access,
       environment: this.yaml.environment,
+      isPreview: this.options.isPreview,
     };
   }
   async start(): Promise<ISpec> {
