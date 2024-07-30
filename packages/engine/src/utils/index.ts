@@ -54,6 +54,11 @@ export const getAllowFailure = (allowFailure: boolean | IAllowFailure | undefine
   if (typeof allowFailure === 'boolean') {
     return allowFailure;
   }
+  // 20240730: feat: when -o, --output-format exist, allow failure
+  const args = process.argv.slice(2);
+  if (args.includes('-o') || args.includes('--output-format')) {
+    return true;
+  }
   if (typeof allowFailure !== 'object') return false;
   if ('exit_code' in allowFailure && 'command' in allowFailure) {
     return includes(get(allowFailure, 'exit_code'), get(data, 'exitCode')) && includes(get(allowFailure, 'command'), get(data, 'command'));
