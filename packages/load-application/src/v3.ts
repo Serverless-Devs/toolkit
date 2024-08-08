@@ -13,7 +13,7 @@ import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
-import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray } from './constant';
+import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray, DIPPER_VARIABLES_PATH } from './constant';
 const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-appliaction') : (i: any) => {};
 
 class LoadApplication {
@@ -76,22 +76,26 @@ class LoadApplication {
      */
     await this.parsePublishYaml();
     /**
-     * 4. 执行 postInit 钩子
+     * 4. 解析 variable.yaml (Dipper变量中心)
+     */
+    this.parseVariableYaml();
+    /**
+     * 5. 执行 postInit 钩子
      */
     const postData = await this.postInit();
 
     const { _custom_secret_list, ...restPostData } = postData || {};
     this.secretList = concat(this.secretList, keys(_custom_secret_list));
     /**
-     * 5. 解析 s.yaml
+     * 6. 解析 s.yaml
      */
     const templateData = await this.parseTemplateYaml(restPostData);
     /**
-     * 6. 解析 s.yaml里的 name 字段
+     * 7. 解析 s.yaml里的 name 字段
      */
     this.parseAppName(templateData as string);
     /**
-     * 7. 最后的动作, 比如：删除临时文件夹
+     * 8. 最后的动作, 比如：删除临时文件夹
      */
     await this.final();
     return this.filePath;
@@ -206,6 +210,20 @@ class LoadApplication {
     }
     if (this.options.y) return;
     this.publishData = await this.parsePublishWithInquire();
+  }
+  /**
+   * 判断s.yaml目录是否有variable.yaml，拼接到publishData
+   */
+  private parseVariableYaml() {
+    const variablePath = getYamlPath(path.join(this.filePath, 'variable.yaml'));
+    if (variablePath && fs.pathExistsSync(variablePath)) {
+      const variableYaml = getYamlContent(variablePath);
+      const services = get(variableYaml, 'services', {});
+      for (const i of keys(services)) {
+        const params = keys(get(services, `${i}`, {}));
+        map(params, (j) => { set(this.publishData, j, `\${self.${j}}`) });
+      }
+    }
   }
   private async parsePublishWithInquire() {
     const publishData = getYamlContent(this.publishPath);
