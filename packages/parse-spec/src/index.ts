@@ -30,6 +30,7 @@ class ParseSpec {
   constructor(filePath: string = '', private options: IOptions = {}) {
     this.options.argv = this.options.argv || process.argv.slice(2);
     this.options.logger = this.options.logger || console;
+    // ${config()} ${secret()} won't show real value in preview mode
     this.options.isPreview = this.options.isPreview || false;
     this.init(filePath);
     debug(`yaml path: ${this.yaml.path}`);
@@ -259,6 +260,7 @@ class ParseSpec {
     this.record.skipActions = get(argv, 'skip-actions');
     this.record.debug = get(argv, 'debug');
     this.record.env = get(argv, 'env');
+    this.record.baselineTemplate = get(argv, 'baseline-template');
     if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
       this.record.command = _[1];

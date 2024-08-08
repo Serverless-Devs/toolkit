@@ -1,7 +1,7 @@
 import { createMachine, interpret } from 'xstate';
 import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size, cloneDeep, find } from 'lodash';
-import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
-import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
+import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS, IDiff } from './types';
+import { getProcessTime, getCredential, stringify, getAllowFailure, getDiffs } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
@@ -34,13 +34,16 @@ class Engine {
   } as IContext;
   private record = { status: STEP_STATUS.PENDING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
+  private baselineSpec = {} as ISpec;
   private glog!: Logger;
   private logger!: ILoggerInstance;
   private parseSpecInstance!: ParseSpec;
+  private parseSpecInstanceBaseline!: ParseSpec;
   private globalActionInstance!: Actions; // 全局的 action
   private actionInstance!: Actions; // 项目的 action
   private info: Record<string, any> = {}; // 存储全局变量
   private secretManager!: SecretManager; // 敏感参数管理
+  private diffs: IDiff[] = []; // baseline diff
 
   constructor(private options: IEngineOptions) {
     debug('engine start');
@@ -72,6 +75,16 @@ class Engine {
       logger: this.logger,
     });
     this.spec = await this.parseSpecInstance.start();
+    // 20240808: Add baselineTemplate, do diff when --baseline-template is set
+    if (this.spec.baselineTemplate) {
+      this.logger.debug(`baselineTemplate: ${this.spec.baselineTemplate}`);
+      this.parseSpecInstanceBaseline = new ParseSpec(get(this.spec, 'baselineTemplate'), {
+        argv: this.options.args,
+        logger: this.logger,
+      });
+      this.baselineSpec = await this.parseSpecInstanceBaseline.start();
+      this.diffs = getDiffs(get(this.spec, 'yaml.content'), get(this.baselineSpec, 'yaml.content')) || [];
+    }
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
@@ -655,6 +668,7 @@ class Engine {
         const res = await new Credential({ logger: this.logger }).get(item.access);
         return get(res, 'credential', {});
       },
+      diffs: filter(this.diffs, (diff) => { return diff.path?.startsWith(`resources.${item.projectName}`) }),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);

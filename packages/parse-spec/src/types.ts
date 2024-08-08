@@ -94,6 +94,7 @@ export interface IRecord {
   help?: boolean;
   debug?: boolean;
   env?: string;
+  baselineTemplate?: string;
 }
 
 export enum IOutput {

@@ -22,4 +22,5 @@ export interface IInputs {
   cwd: string;
   outputs?: Record<string, any>;
   output?: Record<string, any>; // 当前步骤输出
+  diffs?: Record<string, any>[]; // 当 --baseline-template 参数存在时，和基线yaml做diff
 }

@@ -3,6 +3,7 @@ import { IOptions as ILogConfig } from '@serverless-devs/logger/lib/type';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import { AssertionError } from 'assert';
 import { DevsError } from '@serverless-devs/utils';
+import { Diff } from 'deep-diff';
 export interface IEngineOptions {
   args?: string[]; //默认 process.argv.slice(2)
   template?: string;
@@ -13,6 +14,10 @@ export interface IEngineOptions {
   };
   verify?: boolean;
   serverlessDevsVersion?: string;
+}
+
+export type IDiff = Omit<Diff<Object, Object>, "path"> & {
+  path?: string | undefined;
 }
 
 export type IStepOptions = IStep & {
