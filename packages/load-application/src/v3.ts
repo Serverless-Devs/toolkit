@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
-import { getYamlContent, registry, isCiCdEnvironment, getYamlPath, isDevsDebugMode } from '@serverless-devs/utils';
+import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
@@ -14,7 +14,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray, DIPPER_VARIABLES_PATH } from './constant';
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-appliaction') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:load-application');
 
 class LoadApplication {
   /**
@@ -215,7 +215,7 @@ class LoadApplication {
    * 判断s.yaml目录是否有variable.yaml，拼接到publishData
    */
   private parseVariableYaml() {
-    const variablePath = getYamlPath(path.join(this.filePath, 'variable.yaml'));
+    const variablePath = getYamlPath(path.join(this.filePath, DIPPER_VARIABLES_PATH));
     if (variablePath && fs.pathExistsSync(variablePath)) {
       const variableYaml = getYamlContent(variablePath);
       const services = get(variableYaml, 'services', {});

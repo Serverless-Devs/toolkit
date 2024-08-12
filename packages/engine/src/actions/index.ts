@@ -1,7 +1,7 @@
 import { IAction, IActionLevel, IActionType, IAllowFailure, IComponentAction, IHookType, IPluginAction, IRunAction, getInputs } from '@serverless-devs/parse-spec';
 import { isEmpty, filter, includes, set, get } from 'lodash';
 import * as utils from '@serverless-devs/utils';
-import { DevsError, ETrackerType, isDevsDebugMode } from '@serverless-devs/utils';
+import { DevsError, ETrackerType } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import { spawn } from 'child_process';
 import loadComponent from '@serverless-devs/load-component';
@@ -12,7 +12,7 @@ import { ILoggerInstance } from '@serverless-devs/logger';
 import { EXIT_CODE } from '../constants';
 import { IStepOptions } from '../types';
 
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:engine') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
 interface IRecord {
   magic: Record<string, any>; // 记录魔法变量

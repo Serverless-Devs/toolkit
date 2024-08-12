@@ -14,9 +14,9 @@ import { each, filter, find, get, has, includes, isArray, isEmpty, isString, key
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
 import assert from 'assert';
-import { DevsError, ETrackerType, isDevsDebugMode } from '@serverless-devs/utils';
+import { DevsError, ETrackerType } from '@serverless-devs/utils';
 const extend2 = require('extend2');
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 interface IOptions {
   argv?: string[];

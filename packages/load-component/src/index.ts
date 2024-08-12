@@ -2,10 +2,10 @@ import fs from 'fs-extra';
 import { buildComponentInstance, getProvider, getZipballUrl, getComponentCachePath } from './utils';
 import download from '@serverless-devs/downloads';
 import { get } from 'lodash';
-import { readJson, registry, getLockFile, isDevsDebugMode } from '@serverless-devs/utils';
+import { readJson, registry, getLockFile } from '@serverless-devs/utils';
 import assert from 'assert';
 import semver from 'semver';
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-component') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 
 export class Component {
   constructor(private name: string, private params: Record<string, any> = {}, private cleanCache: boolean = false) {

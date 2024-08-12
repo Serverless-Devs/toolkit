@@ -2,10 +2,9 @@ import path from 'path';
 import getInputs from './get-inputs';
 import { IStep } from './types';
 import { getCredential } from './utils';
-import { isDevsDebugMode } from '@serverless-devs/utils';
 import { each, get, omit, set, pickBy, cloneDeep, isEmpty, find } from 'lodash';
 const extend2 = require('extend2');
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 interface IOptions {
   logger?: any;

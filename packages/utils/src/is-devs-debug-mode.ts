@@ -1,4 +1,6 @@
 const packagesList = [
+  '*',
+  'serverless-devs:*',
   'serverless-devs:engine',
   'serverless-devs:parse-spec',
   'serverless-devs:load-component',
