@@ -31,13 +31,13 @@ export const PROVIDER_LIST = [
 
 // 厂商密钥获取文档
 export const PROVIDER_DOCS = {
-  [PROVIDER.alibaba]: 'http://config.devsapp.net/account/alibaba',
-  [PROVIDER.aws]: 'http://config.devsapp.net/account/aws',
-  [PROVIDER.huawei]: 'http://config.devsapp.net/account/huawei',
-  [PROVIDER.azure]: 'http://config.devsapp.net/account/azure',
-  [PROVIDER.baidu]: 'http://config.devsapp.net/account/baidu',
-  [PROVIDER.google]: 'http://config.devsapp.net/account/gcp',
-  [PROVIDER.tencent]: 'http://config.devsapp.net/account/tencent',
+  [PROVIDER.alibaba]: 'https://docs.serverless-devs.com/user-guide/config/',
+  [PROVIDER.aws]: 'https://docs.serverless-devs.com/user-guide/builtin/config/#aws',
+  [PROVIDER.huawei]: 'https://docs.serverless-devs.com/user-guide/builtin/config/#_16',
+  [PROVIDER.azure]: 'https://docs.serverless-devs.com/user-guide/builtin/config/#azure',
+  [PROVIDER.baidu]: 'https://docs.serverless-devs.com/user-guide/builtin/config/#_15',
+  [PROVIDER.google]: 'https://docs.serverless-devs.com/user-guide/builtin/config/#google-cloud',
+  [PROVIDER.tencent]: 'https://docs.serverless-devs.com/user-guide/builtin/config/#_17',
   [PROVIDER.volcengine]: 'https://www.volcengine.com/docs/6291/65568',
 };
 
