@@ -218,11 +218,17 @@ class LoadApplication {
     const variablePath = getYamlPath(path.join(this.filePath, DIPPER_VARIABLES_PATH));
     if (variablePath && fs.pathExistsSync(variablePath)) {
       const variableYaml = getYamlContent(variablePath);
+      // ${self}
       const services = get(variableYaml, 'services', {});
       for (const i of keys(services)) {
         const params = keys(get(services, `${i}`, {}));
         map(params, (j) => { set(this.publishData, j, `\${self.${j}}`) });
       }
+      // ${shared}
+      const shared = get(variableYaml, 'shared', {});
+      console.log(shared);
+      map(keys(shared), (j) => { set(this.publishData, j, `\${shared.${j}}`) });
+      console.log(this.publishData);
     }
   }
   private async parsePublishWithInquire() {
