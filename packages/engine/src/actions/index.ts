@@ -240,7 +240,7 @@ You can still use them now, but we suggest to modify them.`)
   private async plugin(hook: IPluginAction) {
     try {
       // Load the plugin component.
-      const instance = await loadComponent(hook.value);
+      const instance = await loadComponent(hook.value, { logger: this.logger });
       // Determine the inputs for the plugin based on the record's pluginOutput.
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
       // Execute the plugin with the determined inputs and provided arguments.
