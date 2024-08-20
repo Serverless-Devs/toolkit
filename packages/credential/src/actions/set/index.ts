@@ -1,5 +1,5 @@
 import { each, keys, set, intersection, get, isEmpty, merge, isNumber } from 'lodash';
-import { getYamlContent, writeData, Alibaba, IAliCredential } from '../../utils';
+import { prompt, getYamlContent, writeData, Alibaba, IAliCredential, validateInput } from '../../utils';
 import { CRYPTO_STRING, PROVIDER, PROVIDER_CREDENTIAL_KEYS } from '../../constant';
 import Logger from '../../logger';
 import * as inquirer from './inquirer';
@@ -69,10 +69,23 @@ export default class SetCredential {
       }
       set(credInformation, 'AccountID', accountId);
     } catch (ex: any) {
-      Logger.logger.warn(get(ex, 'data.Message'));
-      Logger.logger.warn('Please make sure provided access is legal, or serverless-devs service on Cloud Providers may fail.');
+      Logger.logger.debug(get(ex, 'data.Message'));
+      // Logger.logger.warn('Please make sure provided access is legal, or serverless-devs service on Cloud Providers may fail.');
       if (!uid) {
-        throw ex;
+        Logger.logger.warn('AccountID auto get failed, please input AccountID manually.');
+        Logger.logger.warn('The RAM policy of this AccountID must be set properly. Docs: https://help.aliyun.com/zh/ram/use-cases/ensure-security-of-alibaba-cloud-resources');
+        const option = {
+          type: 'input',
+          message: `AccountID: `,
+          name: 'AccountID',
+          validate: validateInput,
+        };
+        const { AccountID } = await prompt([option]);
+        if (AccountID) {
+          uid = AccountID;
+        } else {
+          throw ex;
+        }
       }
       set(credInformation, 'AccountID', uid);
     }
