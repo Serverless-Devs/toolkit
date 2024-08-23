@@ -3,18 +3,18 @@ import fs from 'fs-extra';
 import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
-import { getYamlContent, registry, isCiCdEnvironment, getYamlPath, isDevsDebugMode } from '@serverless-devs/utils';
+import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue } from './utils';
+import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue, getSecretManager } from './utils';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
-import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray } from './constant';
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-appliaction') : (i: any) => {};
+import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray, DIPPER_VARIABLES_PATH } from './constant';
+const debug = require('@serverless-cd/debug')('serverless-devs:load-application');
 
 class LoadApplication {
   /**
@@ -76,22 +76,26 @@ class LoadApplication {
      */
     await this.parsePublishYaml();
     /**
-     * 4. 执行 postInit 钩子
+     * 4. 解析 variable.yaml (Dipper变量中心)
+     */
+    this.parseVariableYaml();
+    /**
+     * 5. 执行 postInit 钩子
      */
     const postData = await this.postInit();
 
     const { _custom_secret_list, ...restPostData } = postData || {};
     this.secretList = concat(this.secretList, keys(_custom_secret_list));
     /**
-     * 5. 解析 s.yaml
+     * 6. 解析 s.yaml
      */
     const templateData = await this.parseTemplateYaml(restPostData);
     /**
-     * 6. 解析 s.yaml里的 name 字段
+     * 7. 解析 s.yaml里的 name 字段
      */
     this.parseAppName(templateData as string);
     /**
-     * 7. 最后的动作, 比如：删除临时文件夹
+     * 8. 最后的动作, 比如：删除临时文件夹
      */
     await this.final();
     return this.filePath;
@@ -206,6 +210,24 @@ class LoadApplication {
     }
     if (this.options.y) return;
     this.publishData = await this.parsePublishWithInquire();
+  }
+  /**
+   * 判断s.yaml目录是否有variable.yaml，拼接到publishData
+   */
+  private parseVariableYaml() {
+    const variablePath = getYamlPath(path.join(this.filePath, DIPPER_VARIABLES_PATH));
+    if (variablePath && fs.pathExistsSync(variablePath)) {
+      const variableYaml = getYamlContent(variablePath);
+      // ${self}
+      const services = get(variableYaml, 'services', {});
+      for (const i of keys(services)) {
+        const params = keys(get(services, `${i}`, {}));
+        map(params, (j) => { set(this.publishData, j, `\${self.${j}}`) });
+      }
+      // ${shared}
+      const shared = get(variableYaml, 'shared', {});
+      map(keys(shared), (j) => { set(this.publishData, j, `\${shared.${j}}`) });
+    }
   }
   private async parsePublishWithInquire() {
     const publishData = getYamlContent(this.publishPath);
@@ -343,6 +365,13 @@ class LoadApplication {
       const ele = properties[key];
       if (has(parameters, key)) {
         set(data, key, parameters[key]);
+      } else if (ele.type === 'secret') {
+        // support ${secret()}
+        set(data, key, `\${secret('${key}')`);
+        if (ele.hasOwnProperty('default') && getDefaultValue(ele.default)) { 
+          const manager = getSecretManager();
+          manager.addSecret(key, getDefaultValue(ele.default) as string);
+        }
       } else if (ele.hasOwnProperty('default')) {
         set(data, key, getDefaultValue(ele.default));
       } else if (includes(requiredList, key)) {
@@ -385,6 +414,7 @@ class LoadApplication {
           'User-Agent': 'Serverless-Devs (https://github.com/Serverless-Devs/Serverless-Devs)',
           ...registry.getSignHeaders(),
           devs_mock_env: process.env.DEVS_MOCK_ENV || 'false',
+          // use_oss_internal_endpoint: this.options.inner ? 'true' : 'false',
         },
         // use final element as filename
         filename: split(this.name, '/')[-1],
@@ -395,7 +425,7 @@ class LoadApplication {
       if (startsWith(zipball_url, 'https')) {
         logger.debug('https error, try http');
         const newZipballUrl = zipball_url.replace('https://', 'http://');
-        await download(zipball_url, {
+        await download(newZipballUrl, {
           dest: this.tempPath,
           logger,
           extract: true,

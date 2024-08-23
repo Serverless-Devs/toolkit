@@ -1,7 +1,7 @@
 import { createMachine, interpret } from 'xstate';
 import { isEmpty, get, each, map, isFunction, has, uniqueId, filter, omit, includes, set, isNil, isUndefined, keys, size, cloneDeep, find } from 'lodash';
-import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS } from './types';
-import { getProcessTime, getCredential, stringify, getAllowFailure } from './utils';
+import { IStepOptions, IRecord, IStatus, IEngineOptions, IContext, IEngineError, STEP_STATUS, IDiff } from './types';
+import { getProcessTime, getCredential, stringify, getAllowFailure, getDiffs } from './utils';
 import ParseSpec, { getInputs, ISpec, IHookType, IStep as IParseStep, IActionLevel } from '@serverless-devs/parse-spec';
 import path from 'path';
 import chalk from 'chalk';
@@ -9,14 +9,15 @@ import Actions from './actions';
 import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
-import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid, isDevsDebugMode } from '@serverless-devs/utils';
+import SecretManager from '@serverless-devs/secret';
+import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
 import { EXIT_CODE, INFO_EXP_PATTERN, COMPONENT_EXP_PATTERN } from './constants';
 import assert from 'assert';
 import Ajv from 'ajv';
 export * from './types';
 export { verify, preview, init } from './utils';
 
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:engine') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:engine');
 
 /**
  * Engine Class
@@ -33,12 +34,16 @@ class Engine {
   } as IContext;
   private record = { status: STEP_STATUS.PENDING, editStatusAble: true } as IRecord;
   private spec = {} as ISpec;
+  private baselineSpec = {} as ISpec;
   private glog!: Logger;
   private logger!: ILoggerInstance;
   private parseSpecInstance!: ParseSpec;
+  private parseSpecInstanceBaseline!: ParseSpec;
   private globalActionInstance!: Actions; // 全局的 action
   private actionInstance!: Actions; // 项目的 action
   private info: Record<string, any> = {}; // 存储全局变量
+  private secretManager!: SecretManager; // 敏感参数管理
+  private diffs: IDiff[] = []; // baseline diff
 
   constructor(private options: IEngineOptions) {
     debug('engine start');
@@ -56,12 +61,30 @@ class Engine {
     // 初始化 logger
     this.glog = this.getLogger() as Logger;
     this.logger = this.glog.__generate('engine');
+    // 初始化 secretManager
+    this.secretManager = SecretManager.getInstance();
+    // 加密所有敏感值
+    const secrets = this.secretManager.getAllSecrets();
+    for (const i of keys(secrets)) {
+      this.glog.__setSecret([i, secrets[i]]);
+      this.glog.__setSecret([i, this.secretManager.getSecret(i)]);
+    }
     // 初始化 spec
     this.parseSpecInstance = new ParseSpec(get(this.options, 'template'), {
       argv: this.options.args,
       logger: this.logger,
     });
     this.spec = await this.parseSpecInstance.start();
+    // 20240808: Add baselineTemplate, do diff when --baseline-template is set
+    if (this.spec.baselineTemplate) {
+      this.logger.debug(`baselineTemplate: ${this.spec.baselineTemplate}`);
+      this.parseSpecInstanceBaseline = new ParseSpec(get(this.spec, 'baselineTemplate'), {
+        argv: this.options.args,
+        logger: this.logger,
+      });
+      this.baselineSpec = await this.parseSpecInstanceBaseline.start();
+      this.diffs = getDiffs(get(this.spec, 'yaml.content'), get(this.baselineSpec, 'yaml.content')) || [];
+    }
     // 初始化行参环境变量 > .env (parse-spec require .env)
     each(this.options.env, (value, key) => {
       process.env[key] = value;
@@ -645,6 +668,7 @@ class Engine {
         const res = await new Credential({ logger: this.logger }).get(item.access);
         return get(res, 'credential', {});
       },
+      diffs: filter(this.diffs, (diff) => { return diff.path?.startsWith(`resources.${item.projectName}`) }),
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);

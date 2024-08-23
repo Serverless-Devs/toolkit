@@ -1,8 +1,7 @@
 import { includes, map, split, set, sortBy, isEmpty, get, cloneDeep, unset, isObject } from 'lodash';
 import { REGXG } from './contants';
 import { IStep } from './types';
-import { isDevsDebugMode } from '@serverless-devs/utils';
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 class Order {
   private useOrder = false; // 是否使用分析出来的order

@@ -14,13 +14,14 @@ import { each, filter, find, get, has, includes, isArray, isEmpty, isString, key
 import { ISpec, IYaml, IActionType, IActionLevel, IStep, IRecord } from './types';
 import { ENVIRONMENT_FILE_NAME, ENVIRONMENT_FILE_PATH, ENVIRONMENT_KEY, REGX } from './contants';
 import assert from 'assert';
-import { DevsError, ETrackerType, isDevsDebugMode } from '@serverless-devs/utils';
+import { DevsError, ETrackerType } from '@serverless-devs/utils';
 const extend2 = require('extend2');
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:parse-spec') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:parse-spec');
 
 interface IOptions {
   argv?: string[];
   logger?: any;
+  isPreview?: boolean;
 }
 
 class ParseSpec {
@@ -29,6 +30,8 @@ class ParseSpec {
   constructor(filePath: string = '', private options: IOptions = {}) {
     this.options.argv = this.options.argv || process.argv.slice(2);
     this.options.logger = this.options.logger || console;
+    // ${config()} ${secret()} won't show real value in preview mode
+    this.options.isPreview = this.options.isPreview || false;
     this.init(filePath);
     debug(`yaml path: ${this.yaml.path}`);
     debug(`argv: ${JSON.stringify(this.options.argv)}`);
@@ -190,6 +193,7 @@ class ParseSpec {
       projectName: this.record.projectName,
       access: this.record.access,
       environment: this.yaml.environment,
+      isPreview: this.options.isPreview,
     };
   }
   async start(): Promise<ISpec> {
@@ -256,6 +260,7 @@ class ParseSpec {
     this.record.skipActions = get(argv, 'skip-actions');
     this.record.debug = get(argv, 'debug');
     this.record.env = get(argv, 'env');
+    this.record.baselineTemplate = get(argv, 'baseline-template');
     if (includes(this.yaml.projectNames, _[0])) {
       this.record.projectName = _[0];
       this.record.command = _[1];

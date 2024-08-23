@@ -16,4 +16,5 @@ export const CONFIGURE_LATER = 'configure_later';
 export const DEFAULT_MAGIC_ACCESS = '{{ access }}';
 export const REGX = /\${([\w\W]*?)}/;
 
-
+// Dipper
+export const DIPPER_VARIABLES_PATH = 'variable.yaml'

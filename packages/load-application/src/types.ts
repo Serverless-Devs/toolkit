@@ -43,6 +43,10 @@ export interface IOptions {
    * Whether overwrite all files in the destination directory
    */
   overwrite?: boolean;
+  /**
+   * Whether to use for inner apis
+   */
+  inner?: boolean;
 }
 
 export enum IProvider {

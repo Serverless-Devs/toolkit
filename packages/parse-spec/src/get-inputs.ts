@@ -1,8 +1,14 @@
 const compile = require('@serverless-devs/art-template/lib/devs-compile');
 import { isEmpty } from 'lodash';
 
-export const getInputs = (_inputs: Record<string, any> = {}, context: Record<string, any> = {}) => {
-  const inputs = typeof _inputs === 'string' ? compile(_inputs, context) : _inputs;
+interface IOptions {
+  argv?: string[];
+  logger?: any;
+  isPreview?: boolean;
+}
+
+export const getInputs = (_inputs: Record<string, any> = {}, context: Record<string, any> = {}, options: IOptions = {}) => {
+  const inputs = typeof _inputs === 'string' ? compile(_inputs, context, true, options.isPreview || false) : _inputs;
   if (isEmpty(inputs)) return inputs;
   function deepCopy(obj: any) {
     let result: any = obj?.constructor === Array ? [] : {};
@@ -10,7 +16,7 @@ export const getInputs = (_inputs: Record<string, any> = {}, context: Record<str
       for (var i in obj) {
         let val = obj[i];
         if (typeof val === 'string') {
-          val = compile(val, context);
+          val = compile(val, context, true, options.isPreview || false);
         }
         result[i] = typeof val === 'object' ? deepCopy(val) : val;
       }

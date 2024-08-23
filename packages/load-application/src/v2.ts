@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import axios from 'axios';
 import download from '@serverless-devs/downloads';
 import artTemplate from 'art-template';
-import { getYamlContent, isCiCdEnvironment, getYamlPath, isDevsDebugMode } from '@serverless-devs/utils';
+import { getYamlContent, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
 import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, find, startsWith } from 'lodash';
 import parse from './parse';
 import { IProvider, IOptions } from './types';
@@ -14,7 +14,7 @@ import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
 import { gray } from './constant';
 import assert from 'assert';
-const debug = isDevsDebugMode() ? require('@serverless-cd/debug')('serverless-devs:load-application') : (i: any) => {};
+const debug = require('@serverless-cd/debug')('serverless-devs:load-application');
 
 class LoadApplication {
   private provider: `${IProvider}`;

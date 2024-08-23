@@ -1,6 +1,7 @@
 import { keys, replace, split } from 'lodash';
 import { RANDOM_PATTERN, REGISTRY, GITHUB_REGISTRY } from '../constant';
 import Credential from '@serverless-devs/credential';
+import SecretManager from '@serverless-devs/secret';
 
 export { default as getInputs } from './get-inputs';
 
@@ -31,4 +32,9 @@ export const getAllCredential = async ({ logger }: any) => {
 export const getDefaultValue = (value: any) => {
   if (typeof value !== 'string') return;
   return replace(value, RANDOM_PATTERN, randomId());
+};
+
+export const getSecretManager = () => {
+  const secretManager = SecretManager.getInstance();
+  return secretManager;
 };

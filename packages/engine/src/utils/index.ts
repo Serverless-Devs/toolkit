@@ -8,12 +8,24 @@ import Ajv from 'ajv';
 import loadComponent from '@serverless-devs/load-component';
 import loadApplication from '@serverless-devs/load-application';
 import path from 'path';
+import deepDiff from 'deep-diff';
 
 export function getLogPath(filePath: string) {
   return `step_${filePath}.log`;
 }
 
 export const randomId = () => Math.random().toString(16).slice(2);
+
+export const getDiffs = (leftObject: Object, rightObject: Object) => {
+  const diffs = deepDiff.diff(leftObject, rightObject);
+  const formattedDiffs = diffs?.map((diff) => {
+    return {
+      ...diff,
+      path: diff.path?.join('.'),
+    }
+  });
+  return formattedDiffs || [];
+};
 
 export function getProcessTime(time: number) {
   return (Math.round((Date.now() - time) / 10) * 10) / 1000;
@@ -53,6 +65,11 @@ export const stringify = (value: any) => {
 export const getAllowFailure = (allowFailure: boolean | IAllowFailure | undefined, data: { exitCode?: number; command?: string }): boolean => {
   if (typeof allowFailure === 'boolean') {
     return allowFailure;
+  }
+  // 20240730: feat: when -o, --output-format exist, allow failure
+  const args = process.argv.slice(2);
+  if (args.includes('-o') || args.includes('--output-format')) {
+    return true;
   }
   if (typeof allowFailure !== 'object') return false;
   if ('exit_code' in allowFailure && 'command' in allowFailure) {
