@@ -226,9 +226,7 @@ class LoadApplication {
       }
       // ${shared}
       const shared = get(variableYaml, 'shared', {});
-      console.log(shared);
       map(keys(shared), (j) => { set(this.publishData, j, `\${shared.${j}}`) });
-      console.log(this.publishData);
     }
   }
   private async parsePublishWithInquire() {
