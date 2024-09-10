@@ -648,6 +648,10 @@ class Engine {
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
     const { projectName, command } = this.spec;
+    // 20240910: if resource does not exist in baseline, diffs will be empty
+    const diffs = get(this.baselineSpec, `yaml.content.resources.${item.projectName}`) ? 
+      filter(this.diffs, (diff) => { return diff.path?.startsWith(`resources.${item.projectName}`) }) :
+      [];
     const result = {
       cwd: this.options.cwd,
       userAgent: getUserAgent({ component: item.instance.__info }),
@@ -668,7 +672,7 @@ class Engine {
         const res = await new Credential({ logger: this.logger }).get(item.access);
         return get(res, 'credential', {});
       },
-      diffs: filter(this.diffs, (diff) => { return diff.path?.startsWith(`resources.${item.projectName}`) }),
+      diffs: diffs,
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);
