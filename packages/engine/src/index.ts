@@ -402,7 +402,7 @@ class Engine {
           try {
             res = await this.doSrc(item, {}, spec);
           } catch(e) {
-            this.logger.warn(e);
+            this.logger.warn(get(e, 'data'));
           }
         } else {
           res = await this.doSrc(item, {}, spec);
