@@ -140,7 +140,18 @@ class LoadApplication {
   private async parseTemplateYaml(postData: Record<string, any>) {
     if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
+    if (!isEmpty(this.getExtend(this.spath))) {
+      this.doArtTemplate(this.getExtend(this.spath));
+    }
     return this.doArtTemplate(this.spath);
+  }
+  // 如果存在extend，对extend地址也做一个art-template
+  private getExtend(filePath: string) {
+    const sData = getYamlContent(filePath);
+    if (get(sData, 'extend')) {
+      return get(sData, 'extend');
+    }
+    return '';
   }
   private doArtTemplate(filePath: string) {
     const publishData = getYamlContent(this.publishPath);
