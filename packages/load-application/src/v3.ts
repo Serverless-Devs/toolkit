@@ -130,11 +130,19 @@ class LoadApplication {
 
   private parseAppName(_data: string) {
     if (isEmpty(this.spath)) return;
-    const data = _data || fs.readFileSync(this.spath, 'utf-8');
-    const { appName } = this.options;
-    if (isEmpty(appName)) return;
-    const newData = parse({ appName }, data);
-    fs.writeFileSync(this.spath, newData, 'utf-8');
+    if (isEmpty(this.getExtend(this.spath))) {
+      const data = _data || fs.readFileSync(this.spath, 'utf-8');
+      const { appName } = this.options;
+      if (isEmpty(appName)) return;
+      const newData = parse({ appName }, data);
+      fs.writeFileSync(this.spath, newData, 'utf-8');
+    } else {
+      const data = fs.readFileSync(this.getExtend(this.spath), 'utf-8');
+      const { appName } = this.options;
+      if (isEmpty(appName)) return;
+      const newData = parse({ appName }, data);
+      fs.writeFileSync(this.getExtend(this.spath), newData, 'utf-8');
+    } 
   }
 
   private async parseTemplateYaml(postData: Record<string, any>) {
@@ -147,11 +155,15 @@ class LoadApplication {
   }
   // 如果存在extend，对extend地址也做一个art-template
   private getExtend(filePath: string) {
-    const sData = getYamlContent(filePath);
-    if (get(sData, 'extend')) {
-      return get(sData, 'extend');
+    try {
+      const sData = getYamlContent(filePath);
+      if (get(sData, 'extend')) {
+        return get(sData, 'extend');
+      }
+      return '';
+    } catch (error) {
+      throw error;
     }
-    return '';
   }
   private doArtTemplate(filePath: string) {
     const publishData = getYamlContent(this.publishPath);
