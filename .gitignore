@@ -8,4 +8,5 @@ coverage/
 *.zip
 .s
 lib
+!*/acc/lib/
 replace-committers.sh*
