@@ -141,7 +141,7 @@ async function getCredential(profile, parent) {
   }
   case 'StsToken': {
     const config = new Config({
-      type: 'sts_token',
+      type: 'sts',
       accessKeyId: profile['access_key_id'],          // AccessKeyId of your account
       accessKeySecret: profile['access_key_secret'],  // AccessKeySecret of your account
       securityToken: profile['sts_token']
