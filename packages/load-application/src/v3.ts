@@ -137,11 +137,11 @@ class LoadApplication {
       const newData = parse({ appName }, data);
       fs.writeFileSync(this.spath, newData, 'utf-8');
     } else {
-      const data = fs.readFileSync(this.getExtend(this.spath), 'utf-8');
+      const data = fs.readFileSync(path.join(this.filePath, this.getExtend(this.spath)), 'utf-8');
       const { appName } = this.options;
       if (isEmpty(appName)) return;
       const newData = parse({ appName }, data);
-      fs.writeFileSync(this.getExtend(this.spath), newData, 'utf-8');
+      fs.writeFileSync(path.join(this.filePath, this.getExtend(this.spath)), newData, 'utf-8');
     } 
   }
 
@@ -149,7 +149,7 @@ class LoadApplication {
     if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
     if (!isEmpty(this.getExtend(this.spath))) {
-      this.doArtTemplate(this.getExtend(this.spath));
+      this.doArtTemplate(path.join(this.filePath, this.getExtend(this.spath)));
     }
     return this.doArtTemplate(this.spath);
   }
