@@ -137,6 +137,7 @@ class LoadApplication {
       const newData = parse({ appName }, data);
       fs.writeFileSync(this.spath, newData, 'utf-8');
     } else {
+      this.doArtTemplate(path.join(this.filePath, this.getExtend(this.spath))); // 存在extend，把base yaml也做解析
       const data = fs.readFileSync(path.join(this.filePath, this.getExtend(this.spath)), 'utf-8');
       const { appName } = this.options;
       if (isEmpty(appName)) return;
@@ -148,9 +149,6 @@ class LoadApplication {
   private async parseTemplateYaml(postData: Record<string, any>) {
     if (isEmpty(this.publishData)) return;
     this.publishData = { ...this.publishData, ...postData };
-    if (!isEmpty(this.getExtend(this.spath))) {
-      this.doArtTemplate(path.join(this.filePath, this.getExtend(this.spath)));
-    }
     return this.doArtTemplate(this.spath);
   }
   // 如果存在extend，对extend地址也做一个art-template
