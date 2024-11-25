@@ -157,10 +157,13 @@ You can still use them now, but we suggest to modify them.`)
       });
 
       // Listen to the 'data' event of stderr. Append the data chunk to the logger and the stderr array.
-      cp.stderr.on('data', (chunk: Buffer) => {
-        this.logger.append(chunk.toString());
-        stderr.push(chunk);
-      });
+      // 20241125: aliyun task worker wouldn't output stderr
+      if (utils.getCurrentEnvironment() !== 'app_center'){
+        cp.stderr.on('data', (chunk: Buffer) => {
+          this.logger.append(chunk.toString());
+          stderr.push(chunk);
+        });
+      }
 
       // Listen to the 'exit' event of the command process.
       // If the process exits with a code of 0, resolve the promise.
