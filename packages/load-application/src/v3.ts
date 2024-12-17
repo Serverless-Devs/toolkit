@@ -4,7 +4,7 @@ import download from '@serverless-devs/downloads';
 import _artTemplate from 'art-template';
 import _devsArtTemplate from '@serverless-devs/art-template';
 import { getYamlContent, registry, isCiCdEnvironment, getYamlPath } from '@serverless-devs/utils';
-import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge } from 'lodash';
+import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, startsWith, merge, cond } from 'lodash';
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
@@ -250,12 +250,87 @@ class LoadApplication {
       map(keys(shared), (j) => { set(this.publishData, j, `\${shared.${j}}`) });
     }
   }
+
+  private executeCode(code: string, context: Record<string, any>): any {
+    const keys = Object.keys(context);
+    const values = keys.map(key => context[key]);
+    const func = new Function(...keys, `return (${code});`);
+    return func(...values);
+  }  
+
+  private getPromptList(requiredList: string[], rangeList: any[]) {
+    const promptList = [];
+    const tmpResult: any = {};
+    for (const item of rangeList) {
+      const name = item.__key;
+      if (item.cond) tmpResult[name] = '';
+      const prefix = item.description ? `${gray(item.description)}\n${chalk.green('?')}` : undefined;
+      const validate = (input: string) => {
+        if (isEmpty(input)) {
+          return includes(requiredList, name) ? 'value cannot be empty.' : true;
+        }
+        if (item.pattern) {
+          return new RegExp(item.pattern).test(input) ? true : item.description;
+        }
+        return true;
+      };
+      if (item.input === 'false' || item.input === false) {
+        // 不手动输入
+        tmpResult[name] = getDefaultValue(item.default) || '';
+      } else if (item.type === 'boolean') {
+        // 布尔类型
+        promptList.push({
+          type: 'confirm',
+          name,
+          prefix,
+          message: item.title,
+          default: item.default,
+        });
+      } else if (item.type === 'secret') {
+        // 记录密码类型的参数写入.env文件
+        this.secretList.push(name);
+        // 密码类型
+        promptList.push({
+          type: 'password',
+          name,
+          prefix,
+          message: item.title,
+          default: item.default,
+          validate,
+        });
+      } else if (item.enum) {
+        // 枚举类型
+        promptList.push({
+          type: 'list',
+          name,
+          prefix,
+          message: item.title,
+          choices: item.enum,
+          default: item.default,
+        });
+      } else if (item.type === 'string') {
+        // 字符串类型
+        promptList.push({
+          type: 'input',
+          message: item.title,
+          name,
+          prefix,
+          default: getDefaultValue(item.default),
+          validate,
+        });
+      }
+    }
+    return { promptList, tmpResult };
+  }
   private async parsePublishWithInquire() {
     const publishData = getYamlContent(this.publishPath);
     const properties = get(publishData, 'Parameters.properties');
     const requiredList = get(publishData, 'Parameters.required');
-    const promptList = [];
-    const tmpResult: any = {};
+    let promptList: any[] = [];
+    let condPromptList: any[] = [];
+    let tmpResult: any = {};
+    let condTmpResult: any = {};
+    let condList: any[] = [];
     if (properties) {
       let rangeList = [];
       for (const key in properties) {
@@ -264,64 +339,13 @@ class LoadApplication {
         rangeList.push(ele);
       }
       rangeList = sortBy(rangeList, o => o['x-range']);
-      for (const item of rangeList) {
-        const name = item.__key;
-        const prefix = item.description ? `${gray(item.description)}\n${chalk.green('?')}` : undefined;
-        const validate = (input: string) => {
-          if (isEmpty(input)) {
-            return includes(requiredList, name) ? 'value cannot be empty.' : true;
-          }
-          if (item.pattern) {
-            return new RegExp(item.pattern).test(input) ? true : item.description;
-          }
-          return true;
-        };
-        if (item.input === 'false' || item.input === false) {
-          // 不手动输入
-          tmpResult[name] = getDefaultValue(item.default) || '';
-        } else if (item.type === 'boolean') {
-          // 布尔类型
-          promptList.push({
-            type: 'confirm',
-            name,
-            prefix,
-            message: item.title,
-            default: item.default,
-          });
-        } else if (item.type === 'secret') {
-          // 记录密码类型的参数写入.env文件
-          this.secretList.push(name);
-          // 密码类型
-          promptList.push({
-            type: 'password',
-            name,
-            prefix,
-            message: item.title,
-            default: item.default,
-            validate,
-          });
-        } else if (item.enum) {
-          // 枚举类型
-          promptList.push({
-            type: 'list',
-            name,
-            prefix,
-            message: item.title,
-            choices: item.enum,
-            default: item.default,
-          });
-        } else if (item.type === 'string') {
-          // 字符串类型
-          promptList.push({
-            type: 'input',
-            message: item.title,
-            name,
-            prefix,
-            default: getDefaultValue(item.default),
-            validate,
-          });
-        }
-      }
+      // 筛选带条件的参数
+      condList = rangeList.filter((item) => { return item.cond ? true : false })
+      // 筛选不带条件的参数
+      rangeList = rangeList.filter((item) => { return item.cond ? false : true })
+      const { promptList: _promptList, tmpResult: _tmpResult } = this.getPromptList(requiredList, rangeList);
+      promptList = _promptList;
+      tmpResult = _tmpResult;
     }
     const credentialAliasList = map(await getAllCredential({ logger: this.options.logger }), o => ({
       name: o,
@@ -361,6 +385,20 @@ class LoadApplication {
       }
     }
     result = merge(tmpResult, result);
+    // 有条件的参数获取
+    condList.map((item) => {
+      set(condTmpResult, item.__key, '');
+    });
+    condList = condList.filter((item) => {
+      return this.executeCode(item.cond, result);
+    })
+    const { promptList: _condPromptList, tmpResult: _condTmpResult } = this.getPromptList(requiredList, condList);
+    condPromptList = _condPromptList;
+    condTmpResult = merge(condTmpResult, _condTmpResult);
+    let condResult = await inquirer.prompt(condPromptList);
+    condResult = merge(condTmpResult, condResult);
+    // 最终合并
+    result = merge(result, condResult);
     return result;
   }
   private async getCredentialDirectly() {
