@@ -7,7 +7,7 @@ import logger from '../util/logger';
 import path from 'path';
 import yaml from 'js-yaml';
 import querystring from 'querystring';
-import { forEach, get, isEmpty, includes } from 'lodash';
+import { forEach, get, isEmpty, includes, keys, difference } from 'lodash';
 import chalk from 'chalk';
 import { publishSchema } from './constant';
 import Ajv from 'ajv';
@@ -100,30 +100,6 @@ function getFlowsYaml(str: string | undefined, codeUri: string) {
 
 async function getUploadUrl(codeUri: string): Promise<string> {
   const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
-  checkEdition(publishYaml);
-
-  const yamlObject = yaml.load(publishYaml) as Record<string, any>;
-  const errorMsg = `Publish.yaml illegal.
-  Application dev: https://manual.serverless-devs.com/dev-guide/application/
-  Component dev: https://manual.serverless-devs.com/dev-guide/component/
-  Plugin dev: https://manual.serverless-devs.com/dev-guide/plugin/
-  `  
-  const ajv = new Ajv({ allErrors: true });
-  const validate = ajv.compile(publishSchema);
-  if(!validate(yamlObject)) {
-    const errors = validate.errors;
-    if(errors) {
-      errors.forEach((error) => {
-        const {schemaPath, message} = error;
-        logger.error(`Publish.yaml illegal:\nyamlPath: ${path.join(codeUri, 'publish.yaml')}\nschemaPath: ${schemaPath}\nmessage: ${message}`)
-      })
-      throw new Error(errorMsg);
-    }
-  }
-  if(yamlObject.Type === 'Component' && (!yamlObject.Commands || yamlObject.Commands.length === 0)) {
-    logger.write('Publish.yaml illegal, \'Commands\' should be defined in Component\'s publish.yaml , please check the yaml.')
-    throw new Error(errorMsg);
-  }
 
   const publishEnYaml = getYamlContentText(path.join(codeUri, 'publish_en'));
   const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
@@ -185,7 +161,94 @@ export const list = async (options?: IList) => {
   return body;
 };
 
+// yaml validate before publish
+const validate = (codeUri: string) => {
+  const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
+  checkEdition(publishYaml);
+
+  try {
+    yaml.load(publishYaml) as Record<string, any>;
+  } catch (error) {
+    throw new Error(`Publish.yaml format error, please check the yaml.`);
+  }
+  const yamlObject = yaml.load(publishYaml) as Record<string, any>;
+  const errorMsg = `Publish.yaml illegal.
+  Application dev: https://manual.serverless-devs.com/dev-guide/application/
+  Component dev: https://manual.serverless-devs.com/dev-guide/component/
+  Plugin dev: https://manual.serverless-devs.com/dev-guide/plugin/
+  `  
+  const ajv = new Ajv({ allErrors: true });
+  const validate = ajv.compile(publishSchema);
+  if(!validate(yamlObject)) {
+    const errors = validate.errors;
+    if(errors) {
+      errors.forEach((error) => {
+        const {schemaPath, message} = error;
+        logger.error(`Publish.yaml illegal:\nyamlPath: ${path.join(codeUri, 'publish.yaml')}\nschemaPath: ${schemaPath}\nmessage: ${message}`)
+      })
+      throw new Error(errorMsg);
+    }
+  }
+  if(yamlObject.Type === 'Component' && (!yamlObject.Commands || yamlObject.Commands.length === 0)) {
+    logger.write('Publish.yaml illegal, \'Commands\' should be defined in Component\'s publish.yaml , please check the yaml.')
+    throw new Error(errorMsg);
+  }
+
+  let services: string[] = [];
+  const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
+  if (sYaml != undefined) {
+    try {
+      const sObj = yaml.load(sYaml) as Record<string, any>;
+      services = keys(get(sObj, 'resources'));
+    } catch {
+      // throw Error('s.yaml format error.');
+    }
+  }
+  // build.yaml check
+  const buildYaml = getYamlContentText(path.join(codeUri, 'src', 'build')) as string;
+  if (buildYaml != undefined) {
+    // 1. format check
+    try {
+      yaml.load(buildYaml) as Record<string, any>;
+    } catch {
+      throw Error('build.yaml format error.');
+    }
+    // 2. check build.yaml services
+    const buildObj = yaml.load(buildYaml) as Record<string, any>;
+    const buildServices = keys(buildObj);
+    if (services.length > 0) {
+      // if buildServices are not in services, throw error
+      const errorServices = difference(buildServices, services);
+      if (errorServices.length > 0) {
+        throw Error(`build.yaml services: ${errorServices.join(',')} are not in s.yaml services: ${services.join(',')}`);
+      }
+    } 
+  }
+  // variables.yaml check
+  const variablesYaml = getYamlContentText(path.join(codeUri, 'src', 'variables')) as string;
+  if (variablesYaml != undefined) {
+    // 1. format check
+    try {
+      yaml.load(variablesYaml) as Record<string, any>;
+    } catch {
+      throw Error('variables.yaml format error.');
+    }
+    // 2. check variables.yaml services
+    const variablesObj = yaml.load(variablesYaml) as Record<string, any>;
+    const variablesServices = keys(get(variablesObj, 'services'));
+    if (services.length > 0) {
+      // if variablesServices are not in services, throw error
+      const errorServices = difference(variablesServices, services);
+      if (errorServices.length > 0) {
+        throw Error(`variables.yaml services: ${errorServices.join(',')} are not in s.yaml services: ${services.join(',')}`);
+      }
+    }
+  }
+}
+
 export const publish = async (codeUri: string) => {
+  // 发布前校验
+  validate(codeUri);
   // 发布版本，获取上传文件地址
   const uploadUrl = await getUploadUrl(codeUri);
   logger.debug(`Publish upload url: ${uploadUrl}`);
