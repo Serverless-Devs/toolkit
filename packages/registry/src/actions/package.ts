@@ -202,6 +202,14 @@ export const publish = async (codeUri: string) => {
   logger.debug(`Zip file count: ${zipResult.count}`);
   logger.debug(`Zip file outputFile: ${zipResult.outputFile}`);
 
+  // if size > 10MB, show warning, > 20MB, show error
+  if (zipResult.compressedSize > 10 * 1024 * 1024 && zipResult.compressedSize <= 20 * 1024 * 1024) {
+    logger.warn(`Package size is ${zipResult.compressedSize / 1024 / 1024}MB, which is larger than 10MB.`);
+  } else if (zipResult.compressedSize > 20 * 1024 * 1024) {
+    logger.error(`Package size is ${zipResult.compressedSize / 1024 / 1024}MB, which is larger than 20MB.`);
+    throw new Error('Package size is larger than 20MB. Please optimize your package.');
+  }
+
   // 上传压缩文件
   await request.request_put(uploadUrl, zipResult.outputFile);
   logger.write(`${chalk.green(`Publish package ${packageInfo} success.`)}`);
