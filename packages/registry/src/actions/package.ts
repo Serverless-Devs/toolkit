@@ -226,13 +226,13 @@ const validate = (codeUri: string) => {
     } 
   }
   // variables.yaml check
-  const variablesYaml = getYamlContentText(path.join(codeUri, 'src', 'variables')) as string;
+  const variablesYaml = getYamlContentText(path.join(codeUri, 'src', 'variable')) as string;
   if (variablesYaml != undefined) {
     // 1. format check
     try {
       yaml.load(variablesYaml) as Record<string, any>;
     } catch {
-      throw Error('variables.yaml format error.');
+      throw Error('variable.yaml format error.');
     }
     // 2. check variables.yaml services
     const variablesObj = yaml.load(variablesYaml) as Record<string, any>;
@@ -241,7 +241,7 @@ const validate = (codeUri: string) => {
       // if variablesServices are not in services, throw error
       const errorServices = difference(variablesServices, services);
       if (errorServices.length > 0) {
-        throw Error(`variables.yaml services: ${errorServices.join(',')} are not in s.yaml services: ${services.join(',')}`);
+        throw Error(`variable.yaml services: ${errorServices.join(',')} are not in s.yaml services: ${services.join(',')}`);
       }
     }
   }
