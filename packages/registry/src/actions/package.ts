@@ -11,6 +11,7 @@ import { forEach, get, isEmpty, includes, keys, difference } from 'lodash';
 import chalk from 'chalk';
 import { publishSchema } from './constant';
 import Ajv from 'ajv';
+import { validateTemplateParameters } from 'src/util/validate';
 
 interface IRequest {
   /**
@@ -195,7 +196,7 @@ const validate = (codeUri: string) => {
   }
 
   let services: string[] = [];
-  const sYaml = getYamlContentText(path.join(codeUri, 'src', 's'));
+  const sYaml = getYamlContentText(path.join(codeUri, 'src', 's')) as string;
   if (sYaml != undefined) {
     try {
       const sObj = yaml.load(sYaml) as Record<string, any>;
@@ -243,6 +244,12 @@ const validate = (codeUri: string) => {
         throw Error(`variables.yaml services: ${errorServices.join(',')} are not in s.yaml services: ${services.join(',')}`);
       }
     }
+  }
+  const { valid, errInfo } = validateTemplateParameters(sYaml, publishYaml);
+  if (!valid) {
+    throw new Error(errInfo?.message);
+  } else if (valid && errInfo?.code === 'failed') {
+    logger.warn(errInfo?.message);
   }
 }
 
