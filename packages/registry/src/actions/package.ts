@@ -11,7 +11,7 @@ import { forEach, get, isEmpty, includes, keys, difference } from 'lodash';
 import chalk from 'chalk';
 import { publishSchema } from './constant';
 import Ajv from 'ajv';
-import { validateTemplateParameters } from 'src/util/validate';
+import { validateTemplateParameters } from '../util/validate';
 
 interface IRequest {
   /**
