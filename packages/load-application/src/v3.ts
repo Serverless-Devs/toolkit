@@ -13,6 +13,7 @@ import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import Credential from '@serverless-devs/credential';
+import { Parser } from 'expr-eval';
 import { CONFIGURE_LATER, DEFAULT_MAGIC_ACCESS, GITHUB_REGISTRY, gray, DIPPER_VARIABLES_PATH } from './constant';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-application');
 
@@ -252,10 +253,7 @@ class LoadApplication {
   }
 
   private executeCode(code: string, context: Record<string, any>): any {
-    const keys = Object.keys(context);
-    const values = keys.map(key => context[key]);
-    const func = new Function(...keys, `return (${code});`);
-    return func(...values);
+    return Parser.evaluate(code, context);
   }  
 
   private getPromptList(requiredList: string[], rangeList: any[]) {

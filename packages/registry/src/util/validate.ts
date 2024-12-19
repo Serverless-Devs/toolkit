@@ -1,8 +1,9 @@
 import artTemplate from "@serverless-devs/art-template";
 import yaml from "js-yaml";
-import { set, get, keys } from "lodash";
+import { set, get } from "lodash";
 import YAML from "yaml";
 import util from "util";
+import logger from "./logger";
 
 const TYPE = {
   PARAM: 'param',
@@ -230,9 +231,11 @@ export const validateTemplateParameters = (sYamlText: string, publishYamlText: s
   let sYamlDict: any;
   try {
     sYamlDict = yaml.load(formattedSYaml);
-  } catch {
+  } catch(e) {
     // return hackGetParamsLoc(tplLi[0], properties);
-    return { valid: false, errInfo: { code: 'failed', message: 's.yaml format error.' }};
+    logger.debug('s.yaml format error.');
+    logger.debug(formattedSYaml);
+    return { valid: false, errInfo: { code: 'failed', message: `s.yaml format error: \n${e}` }};
   }
 
   const result = { global: {} as Record<string, any>, services: {} as Record<string, any> };
