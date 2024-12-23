@@ -9,7 +9,7 @@ import yaml from 'js-yaml';
 import querystring from 'querystring';
 import { forEach, get, isEmpty, includes, keys, difference } from 'lodash';
 import chalk from 'chalk';
-import { publishSchema } from './constant';
+import { publishSchema, STANDARD_DIR_STRUCTURE } from './constant';
 import Ajv from 'ajv';
 import { validateTemplateParameters } from '../util/validate';
 
@@ -58,7 +58,7 @@ interface IRequest {
 
 function checkEdition(str: string) {
   if (!str) {
-    throw new Error('Need to publish YAML content');
+    throw new Error('No Publish.yaml found or Publish.yaml is empty.');
   }
   const { Edition } = yaml.load(str) as Record<string, any>;
   if (Edition !== '3.0.0') {
@@ -164,14 +164,17 @@ export const list = async (options?: IList) => {
 
 // yaml validate before publish
 const validate = (codeUri: string) => {
+  // check folders
+  if (!fs.existsSync(path.join(codeUri, 'src'))) {
+    throw new Error(`src folder not found in the current working directory.${STANDARD_DIR_STRUCTURE}`);
+  }
   const publishYaml = getYamlContentText(path.join(codeUri, 'publish')) as string;
-  checkEdition(publishYaml);
-
   try {
     yaml.load(publishYaml) as Record<string, any>;
   } catch (error) {
-    throw new Error(`Publish.yaml format error, please check the yaml.`);
+    throw new Error(`Publish.yaml format error: \n${error}`);
   }
+  checkEdition(publishYaml);
   const yamlObject = yaml.load(publishYaml) as Record<string, any>;
   const errorMsg = `Publish.yaml illegal.
   Application dev: https://manual.serverless-devs.com/dev-guide/application/

@@ -159,3 +159,15 @@ export const publishSchema = {
     }
   }
 }
+
+export const STANDARD_DIR_STRUCTURE = `
+A standard directory structure can be like this:
+├── publish.yaml
+├── readme.md
+├── readme_en.md
+├── version.md
+├── src/
+│  ├── s.yaml
+│  ├── readme.md
+│  └── code
+└── hook`;
