@@ -1,6 +1,6 @@
 import artTemplate from "@serverless-devs/art-template";
 import yaml from "js-yaml";
-import { set, get } from "lodash";
+import { set, get, isEmpty } from "lodash";
 import YAML from "yaml";
 import util from "util";
 import logger from "./logger";
@@ -210,6 +210,7 @@ function checkDuplicateTemplateVariables(_data: any) {
 }
 
 export const validateTemplateParameters = (sYamlText: string, publishYamlText: string) => {
+  if (isEmpty(sYamlText)) return { valid: true, errInfo: {} };
   const publishYamlObj = yaml.load(publishYamlText) as Record<string, any>;
   const parameters = publishYamlObj.Parameters;
   const properties = parameters.properties;
