@@ -15,6 +15,14 @@ export const getGlobalConfig = (key: string, fallback?: string) => {
   return content?.[key] || fallback;
 };
 
+// TODO: 目前只更新了Serverless Devs的utils版本号
+export const clearGlobalConfig = (key: string) => {
+  fs.writeFileSync(GLOBAL_CONFIG_FILE_PATH, yaml.dump({
+    ...getYamlContent(GLOBAL_CONFIG_FILE_PATH),
+    [key]: undefined,
+  }));
+};
+
 export const setGlobalConfig = (key: string, value: unknown) => {
   // 创建 a 目录以及其子目录
   fs.mkdirSync(rootHome, { recursive: true });
