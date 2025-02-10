@@ -23,21 +23,36 @@ export const getYamlContentText = (filePath: string): string | undefined => {
  * @returns
  */
 export const getContentText = (fileUri: string): string | undefined => {
+  // 直接存在则直接返回
   if (fs.existsSync(fileUri)) {
     return fs.readFileSync(fileUri, 'utf-8');
   }
 
-  //支持不同后缀
+  // 解析路径组成部分
   const parsed = path.parse(fileUri);
-  // 生成可能的后缀组合（小写和大写）
-  const extensionsToTry = [parsed.ext.toLowerCase(), parsed.ext.toUpperCase()];
+  const targetDir = parsed.dir || '.';  // 处理根目录情况
+  const targetBaseLower = `${parsed.name}${parsed.ext}`.toLowerCase();
 
-  for (const ext of extensionsToTry) {
-    const modifiedPath = path.join(parsed.dir, `${parsed.name}${ext}`);
-    if (fs.existsSync(modifiedPath)) {
-      return fs.readFileSync(modifiedPath, 'utf-8');
+  try {
+    // 读取目录下的所有文件
+    const files = fs.readdirSync(targetDir);
+    
+    // 遍历寻找匹配项（忽略大小写）
+    for (const file of files) {
+      const filePath = path.join(targetDir, file);
+      const fileInfo = path.parse(filePath);
+      
+      // 组合文件名和后缀并转为小写比较
+      const fileBaseLower = `${fileInfo.name}${fileInfo.ext}`.toLowerCase();
+      
+      if (fileBaseLower === targetBaseLower) {
+        return fs.readFileSync(filePath, 'utf-8');
+      }
     }
+  } catch (err) {
+    // 目录不存在等异常情况
   }
+
   return undefined;
 };
 
