@@ -124,11 +124,8 @@ class Download {
                 file.write(chunk);
               })
               .on('end', () => {
-                file.end(() => {
-                  file.close(() => {
-                    resolve(filePath);
-                  });
-                });
+                file.end();
+                resolve(filePath);
               })
               .on('error', err => {
                 file.destroy();
