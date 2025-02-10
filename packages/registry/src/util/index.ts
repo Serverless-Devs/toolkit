@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { registry, getYamlPath } from '@serverless-devs/utils';
+import path from 'path';
 
 export * as request from './request';
 
@@ -25,6 +26,19 @@ export const getContentText = (fileUri: string): string | undefined => {
   if (fs.existsSync(fileUri)) {
     return fs.readFileSync(fileUri, 'utf-8');
   }
+
+  //支持不同后缀
+  const parsed = path.parse(fileUri);
+  // 生成可能的后缀组合（小写和大写）
+  const extensionsToTry = [parsed.ext.toLowerCase(), parsed.ext.toUpperCase()];
+
+  for (const ext of extensionsToTry) {
+    const modifiedPath = path.join(parsed.dir, `${parsed.name}${ext}`);
+    if (fs.existsSync(modifiedPath)) {
+      return fs.readFileSync(modifiedPath, 'utf-8');
+    }
+  }
+  return undefined;
 };
 
 export function writeFile(token: string) {
