@@ -134,7 +134,11 @@ class Download {
           });
         } else if (response.statusCode === 302 || response.statusCode === 301) {
           // Recursively follow redirects, only a 200 will resolve.
-          this.doDownload(response.headers.location as string).then(val => resolve(val));
+          this.doDownload(response.headers.location as string).then(val => {
+            // fix: download hang in node20+
+            response.destroy();
+            resolve(val);
+          });
         } else {
           reject({
             code: response.statusCode,

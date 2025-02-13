@@ -7,8 +7,8 @@ export const publishSchema = {
     "Provider",
     "Version",
     "Description",
-    "HomePage",
-    "Tags",
+    // "HomePage",
+    // "Tags",
     "Category",
     "Service",
     // "Commands",
@@ -72,40 +72,40 @@ export const publishSchema = {
     },
     "Category": {
       "type": "string",
-      "enum": [
-        "人工智能",
-        "Web 应用",
-        "基础云服务",
-        "新手入门",
-        "开源项目",
-        "Jamstack",
-        "函数Connector",
-        "IoT",
-        "其它",
-        "数据处理",
-        "监控告警",
-        "图文处理",
-        "音视频处理",
-        "全栈应用",
-        "Web框架",
-        "云应用",
-        "基础云产品",
-        "Artificial Intelligence",
-        "Web Appilication",
-        "Basic cloud services",
-        "onboarding",
-        "Open Source",
-        "Function Connector",
-        "Others",
-        "Big Data",
-        "Monitoring alarm",
-        "Image and text processing",
-        "Audio and video processing",
-        "Fullstack application",
-        "Web Framework",
-        "Cloud Application",
-        "Basic cloud products"
-      ]
+      // "enum": [
+      //   "人工智能",
+      //   "Web 应用",
+      //   "基础云服务",
+      //   "新手入门",
+      //   "开源项目",
+      //   "Jamstack",
+      //   "函数Connector",
+      //   "IoT",
+      //   "其它",
+      //   "数据处理",
+      //   "监控告警",
+      //   "图文处理",
+      //   "音视频处理",
+      //   "全栈应用",
+      //   "Web框架",
+      //   "云应用",
+      //   "基础云产品",
+      //   "Artificial Intelligence",
+      //   "Web Appilication",
+      //   "Basic cloud services",
+      //   "onboarding",
+      //   "Open Source",
+      //   "Function Connector",
+      //   "Others",
+      //   "Big Data",
+      //   "Monitoring alarm",
+      //   "Image and text processing",
+      //   "Audio and video processing",
+      //   "Fullstack application",
+      //   "Web Framework",
+      //   "Cloud Application",
+      //   "Basic cloud products"
+      // ]
     },
     "Service": {
       "type": "object",
@@ -159,3 +159,15 @@ export const publishSchema = {
     }
   }
 }
+
+export const STANDARD_DIR_STRUCTURE = `
+A standard directory structure can be like this:
+├── publish.yaml
+├── readme.md
+├── readme_en.md
+├── version.md
+├── src/
+│  ├── s.yaml
+│  ├── readme.md
+│  └── code
+└── hook`;

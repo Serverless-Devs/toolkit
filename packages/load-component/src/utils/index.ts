@@ -7,7 +7,7 @@ import { BASE_URL } from '../constant';
 import assert from 'assert';
 const debug = require('@serverless-cd/debug')('serverless-devs:load-component');
 const getUrlWithLatest = (name: string) => `${BASE_URL}/packages/${name}/release/latest`;
-const getUrlWithVersion = (name: string, versionId: string) => `${BASE_URL}/packages/${name}/release/tags/${versionId}`;
+const getUrlWithVersion = (name: string, versionId: string) => `${BASE_URL}/packages/${name}/release/tags/${encodeURIComponent(versionId)}`;
 
 export function readJsonFile(filePath: string) {
   if (fs.existsSync(filePath)) {

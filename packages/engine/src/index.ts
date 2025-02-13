@@ -10,7 +10,7 @@ import Credential from '@serverless-devs/credential';
 import loadComponent from '@serverless-devs/load-component';
 import Logger, { ILoggerInstance } from '@serverless-devs/logger';
 import SecretManager from '@serverless-devs/secret';
-import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid } from '@serverless-devs/utils';
+import { DevsError, ETrackerType, emoji, getAbsolutePath, getRootHome, getUserAgent, traceid, parseArgv } from '@serverless-devs/utils';
 import { EXIT_CODE, INFO_EXP_PATTERN, COMPONENT_EXP_PATTERN } from './constants';
 import assert from 'assert';
 import Ajv from 'ajv';
@@ -395,7 +395,18 @@ class Engine {
         this.logger.write(`${chalk.gray(`execute info command of [${item.projectName}]...`)}`);
         const spec = cloneDeep(this.spec);
         spec['command'] = 'info';
-        const res: any = await this.doSrc(item, {}, spec);
+        // 20240912 when -f, don't throw error
+        const { f } = parseArgv(this.options.args);
+        let res = {}
+        if (f) {
+          try {
+            res = await this.doSrc(item, {}, spec);
+          } catch(e) {
+            this.logger.warn(get(e, 'data'));
+          }
+        } else {
+          res = await this.doSrc(item, {}, spec);
+        }
         set(this.info, item.projectName, res);
         this.logger.write(`${chalk.gray(`[${item.projectName}] info command executed.`)}`);
       }
@@ -648,6 +659,10 @@ class Engine {
     debug(`magic context: ${JSON.stringify(magic)}`);
     const newInputs = getInputs(item.props, magic);
     const { projectName, command } = this.spec;
+    // 20240910: if resource does not exist in baseline, diffs will be empty
+    const diffs = get(this.baselineSpec, `yaml.content.resources.${item.projectName}`) ? 
+      filter(this.diffs, (diff) => { return diff.path?.startsWith(`resources.${item.projectName}`) }) :
+      [];
     const result = {
       cwd: this.options.cwd,
       userAgent: getUserAgent({ component: item.instance.__info }),
@@ -668,7 +683,7 @@ class Engine {
         const res = await new Credential({ logger: this.logger }).get(item.access);
         return get(res, 'credential', {});
       },
-      diffs: filter(this.diffs, (diff) => { return diff.path?.startsWith(`resources.${item.projectName}`) }),
+      diffs: diffs,
     };
     this.recordContext(item, { props: newInputs });
     debug(`get props: ${JSON.stringify(result)}`);

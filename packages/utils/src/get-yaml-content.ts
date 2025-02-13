@@ -15,6 +15,12 @@ export function getYamlPath(filePath: string) {
   const yamlPath = newPath + '.yaml';
   if (fs.existsSync(yamlPath)) return yamlPath;
 
+  const YAMLPath = newPath + '.YAML';
+  if (fs.existsSync(YAMLPath)) return YAMLPath;
+
+  const YMLPath = newPath + '.YML';
+  if (fs.existsSync(YMLPath)) return YMLPath;
+
   const ymlPath = newPath + '.yml';
   if (fs.existsSync(ymlPath)) return ymlPath;
 }

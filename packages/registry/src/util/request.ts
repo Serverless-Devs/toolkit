@@ -19,8 +19,12 @@ export const new_request_get = async (url: string, headers?: Record<string, stri
           res.push(chunk);
         });
         response.on('end', () => {
-          const r = JSON.parse(Buffer.concat(res).toString());
-          resolve(r);
+          try {
+            const r = JSON.parse(Buffer.concat(res).toString());
+            resolve(r);
+          } catch (e) {
+            throw new Error(`request_get error: ${e}`);
+          }
         });
       },
     );
@@ -50,8 +54,12 @@ export const new_request_post = async (url: string, body?: Record<string, any>):
         res.push(chunk);
       });
       response.on('end', () => {
-        const result = Buffer.concat(res).toString();
-        resolve(JSON.parse(result));
+        try {
+          const result = Buffer.concat(res).toString();
+          resolve(JSON.parse(result));
+        } catch (e) {
+          throw new Error(`request_post error: ${e}`);
+        }
       });
     });
     if (body) {
@@ -84,8 +92,12 @@ export const new_request_remove = async (url: string): Promise<{ request_id: str
         res.push(chunk);
       });
       response.on('end', () => {
-        const result = Buffer.concat(res).toString();
-        resolve(JSON.parse(result));
+        try {
+          const result = Buffer.concat(res).toString();
+          resolve(JSON.parse(result));
+        } catch (e) {
+          throw new Error(`request_remove error: ${e}`);
+        }
       });
     });
     request.end();
@@ -108,7 +120,11 @@ export const request_put = async (url: string, filePath: string): Promise<any> =
         res.push(chunk);
       });
       response.on('end', () => {
-        resolve(Buffer.concat(res).toString());
+        try {
+          resolve(Buffer.concat(res).toString());
+        } catch (e) {
+          throw new Error(`request_put error: ${e}`);
+        }
       });
     });
     request.write(contents);

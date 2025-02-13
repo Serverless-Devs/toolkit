@@ -18,7 +18,10 @@ export const getInputs = (_inputs: Record<string, any> = {}, context: Record<str
         if (typeof val === 'string') {
           val = compile(val, context, true, options.isPreview || false);
         }
-        result[i] = typeof val === 'object' ? deepCopy(val) : val;
+        // 20241113: remove key if val is undefined or null
+        if (typeof val !== 'undefined' && val !== null) {
+          result[i] = typeof val === 'object' ? deepCopy(val) : val;
+        }
       }
     } else {
       result = obj;
