@@ -122,13 +122,18 @@ async function getUploadUrl(codeUri: string): Promise<string> {
     readme,
   };
 
-  const { body, request_id } = await request.new_request_post(PUBLISH_URL, requestBodyIRequest);
-  logger.debug(`Publish responseId: ${request_id}`);
-  if (typeof body === 'string') {
-    throw new Error(body);
+  try {
+    const { body, request_id } = await request.new_request_post(PUBLISH_URL, requestBodyIRequest);
+    logger.debug(`Publish responseId: ${request_id}`);
+    if (typeof body === 'string') {
+      throw new Error(body);
+    }
+    logger.debug(`Publish res body: ${JSON.stringify(body)}`);
+    return body.url;
+  } catch (error) {
+    logger.debug(`Publish error: ${error}`);
+    throw new Error('Publish request error, please check your internet connection or registry setting.');
   }
-  logger.debug(`Publish res body: ${JSON.stringify(body)}`);
-  return body.url;
 }
 
 function getNameAndVersion(codeUri: string): string {
@@ -283,10 +288,15 @@ export const publish = async (codeUri: string) => {
     throw new Error('Package size is larger than 20MB. Please optimize your package.');
   }
 
-  // 上传压缩文件
-  await request.request_put(uploadUrl, zipResult.outputFile);
-  logger.write(`${chalk.green(`Publish package ${packageInfo} success.`)}`);
+  try {
+    // 上传压缩文件
+    await request.request_put(uploadUrl, zipResult.outputFile);
+    logger.write(`${chalk.green(`Publish package ${packageInfo} success.`)}`);
 
-  // 删除压缩文件
-  fs.unlinkSync(zipResult.outputFile);
+    // 删除压缩文件
+    fs.unlinkSync(zipResult.outputFile);
+  } catch (error) {
+    logger.debug(`Upload package ${packageInfo} failed: ${error}`);
+    throw new Error('Upload request error, please check your internet connection or registry setting.');
+  }
 };
