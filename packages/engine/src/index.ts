@@ -396,9 +396,9 @@ class Engine {
         const spec = cloneDeep(this.spec);
         spec['command'] = 'info';
         // 20240912 when -f, don't throw error
-        const { f } = parseArgv(this.options.args);
+        const { f, force } = parseArgv(this.options.args);
         let res = {}
-        if (f) {
+        if (f || force) {
           try {
             res = await this.doSrc(item, {}, spec);
           } catch(e) {
