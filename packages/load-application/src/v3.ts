@@ -95,11 +95,33 @@ class LoadApplication {
      * 7. 解析 s.yaml里的 name 字段
      */
     this.parseAppName(templateData as string);
+    /** 
+     * 8. 解析目录下所有后缀为.stpl的文件
+     */
+    await this.parseStpl(this.filePath);
     /**
-     * 8. 最后的动作, 比如：删除临时文件夹
+     * 9. 最后的动作, 比如：删除临时文件夹
      */
     await this.final();
     return this.filePath;
+  }
+
+  // art-template解析目录下所有后缀为.stpl的文件
+  private async parseStpl(dirPath: string) {
+    const allFiles = fs.readdirSync(dirPath);
+    for (const file of allFiles) {
+      if (fs.statSync(path.join(dirPath, file)).isDirectory()) {
+        await this.parseStpl(path.join(dirPath, file));
+        continue;
+      }
+      if (file.endsWith('.stpl')) {
+        const filePath = path.join(dirPath, file);
+        const newData = this.doArtTemplate(filePath);
+        fs.writeFileSync(filePath, newData, 'utf-8');
+        // 删除.stpl后缀
+        fs.renameSync(filePath, filePath.replace('.stpl', ''));
+      }
+    }
   }
 
   private async check() {
