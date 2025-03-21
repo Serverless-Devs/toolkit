@@ -1,6 +1,9 @@
-import { getGlobalConfig } from "@serverless-devs/utils";
+import { getGlobalConfig } from '@serverless-devs/utils';
 
-const baseUrl = getGlobalConfig('registry', 'https://api.devsapp.cn/v3');
+const baseUrl =
+  getGlobalConfig('registry', 'https://api.devsapp.cn/v3') === 'https://api.devsapp.cn/v3'
+    ? 'https://server-serverlgistry-v-awljqvnszb.cn-hangzhou.fcapp.run/v3'
+    : getGlobalConfig('registry', 'https://api.devsapp.cn/v3');
 // *** 登陆 *** //
 // 登陆
 export const REGISTRY_INFORMATION_GITHUB = `${baseUrl}/user/check`;

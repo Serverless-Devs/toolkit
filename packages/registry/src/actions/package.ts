@@ -1,5 +1,5 @@
 import zip from '@serverless-devs/zip';
-import { getRootHome, registry } from '@serverless-devs/utils';
+import { getRootHome, registry, parseArgv } from '@serverless-devs/utils';
 import fs from 'fs';
 import { getYamlContentText, getContentText, request } from '../util';
 import { PUBLISH_URL, PRIVATE_LIST_URL } from '../request-url';
@@ -121,7 +121,6 @@ async function getUploadUrl(codeUri: string): Promise<string> {
     readme_en: readmeEn,
     readme,
   };
-
   const { body, request_id } = await request.new_request_post(PUBLISH_URL, requestBodyIRequest);
   logger.debug(`Publish responseId: ${request_id}`);
   if (typeof body === 'string') {
@@ -279,14 +278,25 @@ export const publish = async (codeUri: string) => {
   if (zipResult.compressedSize > 10 * 1024 * 1024 && zipResult.compressedSize <= 20 * 1024 * 1024) {
     logger.warn(`Package size is ${zipResult.compressedSize / 1024 / 1024}MB, which is larger than 10MB.`);
   } else if (zipResult.compressedSize > 20 * 1024 * 1024) {
-    logger.error(`Package size is ${zipResult.compressedSize / 1024 / 1024}MB, which is larger than 20MB.`);
-    throw new Error('Package size is larger than 20MB. Please optimize your package.');
+    const argv = process.argv.slice(2);
+    const { f, force } = parseArgv(argv);
+    if (f || force) {
+      logger.warn(`Package size is ${zipResult.compressedSize / 1024 / 1024}MB, which is larger than 20MB.`);
+    } else {
+      logger.error(`Package size is ${zipResult.compressedSize / 1024 / 1024}MB, which is larger than 20MB.`);
+      throw new Error('Package size is larger than 20MB. Please optimize your package.');
+    }
   }
 
-  // 上传压缩文件
-  await request.request_put(uploadUrl, zipResult.outputFile);
-  logger.write(`${chalk.green(`Publish package ${packageInfo} success.`)}`);
+  try {
+    // 上传压缩文件
+    await request.request_put(uploadUrl, zipResult.outputFile);
+    logger.write(`${chalk.green(`Publish package ${packageInfo} success.`)}`);
 
-  // 删除压缩文件
-  fs.unlinkSync(zipResult.outputFile);
+    // 删除压缩文件
+    fs.unlinkSync(zipResult.outputFile);
+  } catch (error) {
+    logger.debug(`Upload package ${packageInfo} failed: ${error}`);
+    throw new Error('Upload request error, please check your internet connection or registry setting.');
+  }
 };
