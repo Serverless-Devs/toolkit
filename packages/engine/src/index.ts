@@ -744,7 +744,7 @@ class Engine {
       throw new DevsError(`The [${command}] command was not found.`, {
         exitCode: EXIT_CODE.DEVS,
         tips: `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：${chalk.underline(
-          'https://manual.serverless-devs.com/',
+          'https://docs.serverless-devs.com/',
         )}`,
         prefix: `[${item.projectName}] failed to [${command}]:`,
         trackerType: ETrackerType.parseException,
@@ -774,7 +774,7 @@ class Engine {
     // 方法不存在，进行警告，但是并不会报错，最终的exit code为0；
     this.logger.tips(
       `The [${command}] command was not found.`,
-      `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：https://manual.serverless-devs.com/`,
+      `Please check the component ${item.component} has the ${command} command. Serverless Devs documents：https://docs.serverless-devs.com/`,
     );
   }
 
