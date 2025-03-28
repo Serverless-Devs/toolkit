@@ -176,9 +176,9 @@ const validate = (codeUri: string) => {
   checkEdition(publishYaml);
   const yamlObject = yaml.load(publishYaml) as Record<string, any>;
   const errorMsg = `Publish.yaml illegal.
-  Application dev: https://manual.serverless-devs.com/dev-guide/application/
-  Component dev: https://manual.serverless-devs.com/dev-guide/component/
-  Plugin dev: https://manual.serverless-devs.com/dev-guide/plugin/
+  Application dev: https://docs.serverless-devs.com/dev-guide/application/
+  Component dev: https://docs.serverless-devs.com/dev-guide/component/
+  Plugin dev: https://docs.serverless-devs.com/dev-guide/plugin/
   `  
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(publishSchema);
