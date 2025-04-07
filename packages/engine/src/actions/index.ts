@@ -23,7 +23,6 @@ interface IRecord {
   allowFailure: boolean | IAllowFailure; // step allow_failure > action allow_failure
   command: string; // 记录当前执行的command
   startTime: number; // 记录开始时间
-  replaceOutput: boolean;
 }
 
 interface IOptions {
