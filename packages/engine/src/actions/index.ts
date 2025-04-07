@@ -1,5 +1,5 @@
 import { IAction, IActionLevel, IActionType, IAllowFailure, IComponentAction, IHookType, IPluginAction, IRunAction, getInputs } from '@serverless-devs/parse-spec';
-import { isEmpty, filter, includes, set, get } from 'lodash';
+import { isEmpty, filter, includes, set, get, cloneDeep } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import { DevsError, ETrackerType } from '@serverless-devs/utils';
 import fs from 'fs-extra';
@@ -23,6 +23,7 @@ interface IRecord {
   allowFailure: boolean | IAllowFailure; // step allow_failure > action allow_failure
   command: string; // 记录当前执行的command
   startTime: number; // 记录开始时间
+  replaceOutput: boolean;
 }
 
 interface IOptions {
@@ -248,6 +249,10 @@ You can still use them now, but we suggest to modify them.`)
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
       // Execute the plugin with the determined inputs and provided arguments.
       this.record.pluginOutput = await instance(inputs, hook.args, this.logger);
+      // If prop 'replace_output' is true, replace the record's step output with the plugin output.
+      if (hook.replace_output) {
+        this.record.step.output = cloneDeep(this.record.pluginOutput);
+      }
     } catch (e) {
       const error = e as Error;
       // Check if the failure is allowed based on the record's allowFailure setting.
