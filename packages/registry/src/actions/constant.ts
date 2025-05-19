@@ -34,24 +34,6 @@ export const publishSchema = {
       "type": "array",
       "items": {
         "type": "string",
-        "enum": [
-          "阿里云",
-          "腾讯云",
-          "华为云",
-          "百度智能云",
-          "AWS",
-          "Azure",
-          "Google Cloud Platform",
-          "专有云",
-          "其它",
-          "火山引擎",
-          "Alibaba Cloud",
-          "Tencent Cloud",
-          "Huawei Cloud",
-          "Baidu Cloud",
-          "Private Cloud",
-          "Others"
-        ]
       }
     },
     "Version": {
