@@ -393,19 +393,48 @@ class Engine {
       const projectInfo = get(this.info, item.projectName);
       if (!projectInfo || isEmpty(projectInfo) || isNil(projectInfo)) {
         this.logger.write(`${chalk.gray(`execute info command of [${item.projectName}]...`)}`);
+        let args = cloneDeep(this.options.args);
+        if (args) {
+          args[0] = 'info';
+        }
+        // 20250520: support action for ${resources.xx.info.xx}
+        const newParseSpecInstance = new ParseSpec(get(this.spec, 'baselineTemplate'), {
+          argv: args,
+          logger: this.logger,
+        });
+        newParseSpecInstance.start();
+        const newAction = newParseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
+        const newActionInstance = new Actions(newAction, {
+          hookLevel: IActionLevel.PROJECT,
+          projectName: item.projectName,
+          logger: item.logger,
+          skipActions: this.spec.skipActions,
+        });
+        newActionInstance.setValue('magic', await this.getFilterContext(item));
+        newActionInstance.setValue('step', item);
+        newActionInstance.setValue('command', 'info');
+        const newInputs = await this.getProps(item);
+        newActionInstance.setValue('componentProps', newInputs);
+        const pluginResult = await this.actionInstance?.start(IHookType.PRE, newInputs) || {};
         const spec = cloneDeep(this.spec);
         spec['command'] = 'info';
         // 20240912 when -f, don't throw error
-        const { f, force } = parseArgv(this.options.args);
-        let res = {}
-        if (f || force) {
-          try {
-            res = await this.doSrc(item, {}, spec);
-          } catch(e) {
-            this.logger.warn(get(e, 'data'));
+        // 20250521: remove previous logic
+        let res: any = {}
+        try {
+          res = await this.doSrc(item, pluginResult, spec);
+          set(newInputs, 'output', res);
+          const pluginSuccessResult = await newActionInstance?.start(IHookType.SUCCESS, newInputs);
+          if (!isEmpty(pluginSuccessResult)) {
+            res = get(pluginSuccessResult, 'step.output');
           }
-        } else {
-          res = await this.doSrc(item, {}, spec);
+        } catch (e) {
+          this.logger.warn(get(e, 'data'));
+          res = get(await newActionInstance?.start(IHookType.FAIL, newInputs), 'step.output') || {};
+        }
+        const pluginCompleteResult = await newActionInstance?.start(IHookType.COMPLETE, newInputs);
+        if (!isEmpty(pluginCompleteResult)) {
+          res = get(pluginCompleteResult, 'step.output');
         }
         set(this.info, item.projectName, res);
         this.logger.write(`${chalk.gray(`[${item.projectName}] info command executed.`)}`);
