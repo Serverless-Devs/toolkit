@@ -398,7 +398,7 @@ class Engine {
           args[0] = 'info';
         }
         // 20250520: support action for ${resources.xx.info.xx}
-        const newParseSpecInstance = new ParseSpec(get(this.spec, 'baselineTemplate'), {
+        const newParseSpecInstance = new ParseSpec(get(this.spec, 'yaml.path'), {
           argv: args,
           logger: this.logger,
         });
