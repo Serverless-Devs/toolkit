@@ -62,11 +62,11 @@ class ParseSpec {
       const code = get(projects, `${i}.props.code`);
       if (code && isString(code)) {
         const codePath = utils.getAbsolutePath(get(projects, `${i}.props.code`, ''));
-        expand(dotenv.config({ path: path.join(codePath, '.env') }));
+        expand(dotenv.config({ path: path.join(codePath, '.env'), override: true }));
       }
     }
 
-    expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env') }));
+    expand(dotenv.config({ path: path.join(path.dirname(this.yaml.path), '.env'), override: true }));
   }
   private async doExtend() {
     // this.yaml = { path: '' }
