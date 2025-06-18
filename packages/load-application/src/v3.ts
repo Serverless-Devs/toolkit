@@ -8,7 +8,7 @@ import { isEmpty, includes, split, get, has, set, sortBy, map, concat, keys, sta
 import axios from 'axios';
 import parse from './parse';
 import { IOptions } from './types';
-import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue, getSecretManager } from './utils';
+import { getInputs, getUrlWithLatest, getUrlWithVersion, getAllCredential, getDefaultValue, getSecretManager, getNumberDefaultValue } from './utils';
 import YAML from 'yaml';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
@@ -336,6 +336,16 @@ class LoadApplication {
           name,
           prefix,
           default: getDefaultValue(item.default),
+          validate,
+        });
+      } else if (item.type === 'number') {
+        // number类型
+        promptList.push({
+          type: 'input',
+          message: item.title,
+          name,
+          prefix,
+          default: getNumberDefaultValue(item.default),
           validate,
         });
       }
