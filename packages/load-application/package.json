@@ -24,7 +24,7 @@
     "@serverless-devs/secret": "workspace:^",
     "@serverless-devs/utils": "workspace:^",
     "art-template": "^4.13.2",
-    "axios": "^1.6.0",
+    "axios": "^1.12.0",
     "chalk": "^4.1.2",
     "expr-eval": "^2.0.2",
     "fs-extra": "^11.1.0",
