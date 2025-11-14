@@ -108,8 +108,8 @@ importers:
         specifier: ^8.2.4
         version: 8.2.5
       js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -368,8 +368,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.1
       js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -409,8 +409,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -443,8 +443,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.1
       js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       macaddress:
         specifier: ^0.5.3
         version: 0.5.3
@@ -452,8 +452,8 @@ importers:
   packages/utils:
     dependencies:
       js-yaml:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.1.1
+        version: 4.1.1
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2135,6 +2135,10 @@ packages:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
 
+  js-yaml@4.1.1:
+    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
+    hasBin: true
+
   jsesc@2.5.2:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}
     engines: {node: '>=4'}
@@ -3334,7 +3338,7 @@ snapshots:
       globals: 13.24.0
       ignore: 5.2.4
       import-fresh: 3.3.0
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -3576,7 +3580,7 @@ snapshots:
       html-minifier: 3.5.21
       is-keyword-js: 1.0.3
       js-tokens: 3.0.2
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lodash: 4.17.21
       merge-source-map: 1.1.0
       source-map: 0.5.7
@@ -3592,7 +3596,7 @@ snapshots:
       html-minifier: 3.5.21
       is-keyword-js: 1.0.3
       js-tokens: 3.0.2
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lodash: 4.17.21
       merge-source-map: 1.1.0
       source-map: 0.5.7
@@ -3621,12 +3625,12 @@ snapshots:
       address: 2.0.3
       crypto-js: 4.2.0
       fs-extra: 11.1.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       macaddress: 0.5.3
 
   '@serverless-devs/utils@0.0.14':
     dependencies:
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lodash: 4.17.21
       md5: 2.3.0
       minimist: 1.2.8
@@ -3634,7 +3638,7 @@ snapshots:
 
   '@serverless-devs/utils@0.0.16-beta.1':
     dependencies:
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lodash: 4.17.21
       md5: 2.3.0
       minimist: 1.2.8
@@ -5143,6 +5147,10 @@ snapshots:
       esprima: 4.0.1
 
   js-yaml@4.1.0:
+    dependencies:
+      argparse: 2.0.1
+
+  js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
 
