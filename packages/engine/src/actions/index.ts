@@ -246,8 +246,20 @@ You can still use them now, but we suggest to modify them.`)
       const instance = await loadComponent(hook.value, { logger: this.logger });
       // Determine the inputs for the plugin based on the record's pluginOutput.
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
+      // 添加hook上下文信息
+      const inputsWithHookContext = {
+        ...inputs,
+        hookContext: {
+          hookType: hook.hookType,        // 例如: 'pre', 'fail', 'success', 'complete'
+          hookName: `${hook.hookType}-${this.record.command}`,  // 例如: 'fail-deploy', 'complete-deploy'
+          command: this.record.command,   // 例如: 'deploy', 'remove'
+          actionType: hook.actionType,    // 'plugin'
+          level: hook.level,              // 'project' 或 'global'
+          projectName: this.option.projectName,  // 项目名称
+        },
+      };
       // Execute the plugin with the determined inputs and provided arguments.
-      this.record.pluginOutput = await instance(inputs, hook.args, this.logger);
+      this.record.pluginOutput = await instance(inputsWithHookContext, hook.args, this.logger);
       // If prop 'replace_output' is true, replace the record's step output with the plugin output.
       if (hook.replace_output) {
         this.record.step.output = cloneDeep(this.record.pluginOutput);

@@ -430,8 +430,12 @@ class Engine {
           }
         } catch (e) {
           this.logger.warn(get(e, 'data'));
+          // 将error信息添加到inputs中传递给fail hook
+          set(newInputs, 'error', e);
           res = get(await newActionInstance?.start(IHookType.FAIL, newInputs), 'step.output') || {};
         }
+        // complete hook需要知道是否有error
+        set(newInputs, 'output', res);
         const pluginCompleteResult = await newActionInstance?.start(IHookType.COMPLETE, newInputs);
         if (!isEmpty(pluginCompleteResult)) {
           res = get(pluginCompleteResult, 'step.output');
@@ -530,7 +534,12 @@ class Engine {
     } catch (error) {
       // On error, attempt to trigger the project's fail hook and update the recorded context.
       try {
-        const res = await this.actionInstance?.start(IHookType.FAIL, this.record.componentProps);
+        // 将error信息添加到inputs中传递给fail hook
+        const failInputs = {
+          ...this.record.componentProps,
+          error: error,
+        };
+        const res = await this.actionInstance?.start(IHookType.FAIL, failInputs);
         this.recordContext(item, get(res, 'pluginOutput', {}));
       } catch (error) {
         this.record.status = STEP_STATUS.FAILURE;
@@ -558,10 +567,14 @@ class Engine {
 
     // Attempt to trigger the project's complete hook regardless of status.
     try {
-      const res = await this.actionInstance?.start(IHookType.COMPLETE, {
+      // complete hook需要包含error信息（如果有的话）
+      const completeInputs = {
         ...this.record.componentProps,
         output: get(item, 'output', {}),
-      });
+        error: get(item, 'error'),
+        status: this.record.status,
+      };
+      const res = await this.actionInstance?.start(IHookType.COMPLETE, completeInputs);
       this.recordContext(item, get(res, 'pluginOutput', {}));
     } catch (error) {
       this.record.status = STEP_STATUS.FAILURE;
