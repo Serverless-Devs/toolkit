@@ -27,7 +27,8 @@ interface IRecord {
 
 interface IOptions {
   hookLevel: `${IActionLevel}`;
-  projectName?: string;
+  projectName?: string;   // 资源名称（resources下的key）
+  appName?: string;       // 项目名称（s.yaml的name字段）
   logger: ILoggerInstance;
   skipActions?: boolean;
 }
@@ -247,15 +248,20 @@ You can still use them now, but we suggest to modify them.`)
       // Determine the inputs for the plugin based on the record's pluginOutput.
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
       // 添加hook上下文信息
+      // level: 'resource' 表示资源级别hook, 'project' 表示项目级别hook（全局）
+      const isResourceLevel = this.option.hookLevel === IActionLevel.PROJECT;
+      const command = this.record.command || '';
+      const hookType = hook.hookType || '';
       const inputsWithHookContext = {
         ...inputs,
         hookContext: {
-          hookType: hook.hookType,        // 例如: 'pre', 'fail', 'success', 'complete'
-          hookName: `${hook.hookType}-${this.record.command}`,  // 例如: 'fail-deploy', 'complete-deploy'
-          command: this.record.command,   // 例如: 'deploy', 'remove'
-          actionType: hook.actionType,    // 'plugin'
-          level: hook.level,              // 'project' 或 'global'
-          projectName: this.option.projectName,  // 项目名称
+          hookType: hookType,                               // 例如: 'pre', 'fail', 'success', 'complete'
+          hookName: command ? `${hookType}-${command}` : hookType,  // 例如: 'fail-deploy', 'complete-deploy'
+          command: command,                                 // 例如: 'deploy', 'remove'
+          actionType: hook.actionType || 'plugin',          // 'plugin'
+          level: isResourceLevel ? 'resource' : 'project',  // 'resource'=资源级别, 'project'=项目级别（全局）
+          projectName: this.option.appName || undefined,    // 项目名称（s.yaml的name字段）
+          resourceName: isResourceLevel ? (this.option.projectName || undefined) : undefined,  // 资源名称（仅resource级别有值）
         },
       };
       // Execute the plugin with the determined inputs and provided arguments.

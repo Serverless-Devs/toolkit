@@ -121,6 +121,7 @@ class Engine {
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
+      appName: get(this.spec, 'yaml.appName'),  // 项目名称
       logger: this.logger,
       skipActions: this.spec.skipActions,
     });
@@ -406,7 +407,8 @@ class Engine {
         const newAction = newParseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
         const newActionInstance = new Actions(newAction, {
           hookLevel: IActionLevel.PROJECT,
-          projectName: item.projectName,
+          projectName: item.projectName,              // 资源名称
+          appName: get(this.spec, 'yaml.appName'),    // 项目名称
           logger: item.logger,
           skipActions: this.spec.skipActions,
         });
@@ -620,7 +622,8 @@ class Engine {
       debug(`project actions: ${JSON.stringify(newAction)}`);
       this.actionInstance = new Actions(newAction, {
         hookLevel: IActionLevel.PROJECT,
-        projectName: item.projectName,
+        projectName: item.projectName,              // 资源名称
+        appName: get(this.spec, 'yaml.appName'),    // 项目名称
         logger: item.logger,
         skipActions: this.spec.skipActions,
       });
