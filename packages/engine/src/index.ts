@@ -433,11 +433,9 @@ class Engine {
         } catch (e) {
           this.logger.warn(get(e, 'data'));
           // 将error信息添加到inputs中传递给fail hook
-          set(newInputs, 'error', e);
+          set(newInputs, 'errorContext', e);
           res = get(await newActionInstance?.start(IHookType.FAIL, newInputs), 'step.output') || {};
         }
-        // complete hook需要知道是否有error
-        set(newInputs, 'output', res);
         const pluginCompleteResult = await newActionInstance?.start(IHookType.COMPLETE, newInputs);
         if (!isEmpty(pluginCompleteResult)) {
           res = get(pluginCompleteResult, 'step.output');
@@ -539,7 +537,7 @@ class Engine {
         // 将error信息添加到inputs中传递给fail hook
         const failInputs = {
           ...this.record.componentProps,
-          error: error,
+          errorContext: error,
         };
         const res = await this.actionInstance?.start(IHookType.FAIL, failInputs);
         this.recordContext(item, get(res, 'pluginOutput', {}));
@@ -573,8 +571,7 @@ class Engine {
       const completeInputs = {
         ...this.record.componentProps,
         output: get(item, 'output', {}),
-        error: get(item, 'error'),
-        status: this.record.status,
+        errorContext: get(item, 'error'),
       };
       const res = await this.actionInstance?.start(IHookType.COMPLETE, completeInputs);
       this.recordContext(item, get(res, 'pluginOutput', {}));
