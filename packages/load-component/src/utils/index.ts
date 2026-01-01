@@ -18,30 +18,35 @@ export function readJsonFile(filePath: string) {
   }
 }
 
-const getEntryFile = async (componentPath: string) => {
-  const fsStat = await fs.stat(componentPath);
-  if (fsStat.isFile() || !fsStat.isDirectory()) return componentPath;
-  const packageInfo: any = readJsonFile(path.resolve(componentPath, 'package.json'));
-  // First look for main under the package json file
-  let entry = get(packageInfo, 'main');
-  if (entry) return path.resolve(componentPath, entry);
-  // Second check the out dir under the tsconfig json file
-  const tsconfigPath = path.resolve(componentPath, 'tsconfig.json');
-  const tsconfigInfo = readJsonFile(tsconfigPath);
-  entry = get(tsconfigInfo, 'compilerOptions.outDir');
-  if (entry) return path.resolve(componentPath, entry);
-  // Third look for src index js
-  const srcIndexPath = path.resolve(componentPath, './src/index.js');
-  if (fs.existsSync(srcIndexPath)) return srcIndexPath;
-  const indexPath = path.resolve(componentPath, './index.js');
-  if (fs.existsSync(indexPath)) return indexPath;
-  throw new Error(
-    'The component cannot be required. Please check whether the setting of the component entry file is correct. In the current directory, first look for main under the package json file, secondly look for compiler options out dir under the tsconfig json file, thirdly look for src index js, and finally look for index js',
-  );
+const getEntryFile = async (componentPath: string, logger: any) => {
+  try {
+    const fsStat = await fs.stat(componentPath);
+    if (fsStat.isFile() || !fsStat.isDirectory()) return componentPath;
+    const packageInfo: any = readJsonFile(path.resolve(componentPath, 'package.json'));
+    // First look for main under the package json file
+    let entry = get(packageInfo, 'main');
+    if (entry) return path.resolve(componentPath, entry);
+    // Second check the out dir under the tsconfig json file
+    const tsconfigPath = path.resolve(componentPath, 'tsconfig.json');
+    const tsconfigInfo = readJsonFile(tsconfigPath);
+    entry = get(tsconfigInfo, 'compilerOptions.outDir');
+    if (entry) return path.resolve(componentPath, entry);
+    // Third look for src index js
+    const srcIndexPath = path.resolve(componentPath, './src/index.js');
+    if (fs.existsSync(srcIndexPath)) return srcIndexPath;
+    const indexPath = path.resolve(componentPath, './index.js');
+    if (fs.existsSync(indexPath)) return indexPath;    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.debug(errorMessage);
+    throw new Error(
+      'The component cannot be required. Please check whether the setting of the component entry file is correct. In the current directory, first look for main under the package json file, secondly look for compiler options out dir under the tsconfig json file, thirdly look for src index js, and finally look for index js',
+    );
+  }
 };
 
 export const buildComponentInstance = async (componentPath: string, params?: any, cleanCache: boolean = false) => {
-  const requirePath = await getEntryFile(componentPath);
+  const requirePath = await getEntryFile(componentPath, params.logger || console);
   // bug: `- component: fc invoke` timeout. Delete require cache
   if (cleanCache && require.cache[requirePath]) {
     try {
