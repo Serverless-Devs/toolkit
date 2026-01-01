@@ -35,7 +35,9 @@ const getEntryFile = async (componentPath: string, logger: any) => {
     const srcIndexPath = path.resolve(componentPath, './src/index.js');
     if (fs.existsSync(srcIndexPath)) return srcIndexPath;
     const indexPath = path.resolve(componentPath, './index.js');
-    if (fs.existsSync(indexPath)) return indexPath;    
+    if (fs.existsSync(indexPath)) return indexPath;
+    // No valid entry file found
+    throw new Error('No valid entry file found');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     logger.debug(errorMessage);
