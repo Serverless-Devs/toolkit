@@ -37,10 +37,16 @@ const getEntryFile = async (componentPath: string, logger: any) => {
     const indexPath = path.resolve(componentPath, './index.js');
     if (fs.existsSync(indexPath)) return indexPath;
     // No valid entry file found
+    console.log(`fsStat: ${JSON.stringify(fsStat)}`);
+    console.log(`packageInfo: ${JSON.stringify(packageInfo)}`);
+    console.log(`tsconfigPath: ${tsconfigPath}`);
+    console.log(`tsconfigInfo: ${JSON.stringify(tsconfigInfo)}`);
+    console.log(`srcIndexPath: ${srcIndexPath}`);
+    console.log(`indexPath: ${indexPath}`);
     throw new Error('No valid entry file found');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.debug(errorMessage);
+    console.log(errorMessage);
     throw new Error(
       'The component cannot be required. Please check whether the setting of the component entry file is correct. In the current directory, first look for main under the package json file, secondly look for compiler options out dir under the tsconfig json file, thirdly look for src index js, and finally look for index js',
     );
