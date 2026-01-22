@@ -21,7 +21,7 @@
     "chalk": "^4.1.2",
     "cli-progress-footer": "^2.3.2",
     "egg-logger": "^3.3.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "prettyjson": "^1.2.5"
   },
   "devDependencies": {

@@ -81,8 +81,8 @@ importers:
   packages/component-manager:
     dependencies:
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       minimist:
         specifier: ^1.2.6
         version: 1.2.8
@@ -111,8 +111,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
 
   packages/diff:
     dependencies:
@@ -123,8 +123,8 @@ importers:
         specifier: 4.1.2
         version: 4.1.2
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
 
   packages/downloads:
     dependencies:
@@ -190,8 +190,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.1
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       string-argv:
         specifier: ^0.3.2
         version: 0.3.2
@@ -254,8 +254,8 @@ importers:
         specifier: ^8.2.4
         version: 8.2.5
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       yaml:
         specifier: ^2.3.1
         version: 2.3.1
@@ -285,8 +285,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.1
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       semver:
         specifier: ^7.5.4
         version: 7.5.4
@@ -316,8 +316,8 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       prettyjson:
         specifier: ^1.2.5
         version: 1.2.5
@@ -329,8 +329,8 @@ importers:
   packages/orm:
     dependencies:
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       loopback-filters:
         specifier: ^1.1.1
         version: 1.1.1
@@ -371,8 +371,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
     devDependencies:
       '@types/lodash':
         specifier: ^4.14.195
@@ -412,8 +412,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       opn:
         specifier: ^6.0.0
         version: 6.0.0
@@ -455,8 +455,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       md5:
         specifier: ^2.3.0
         version: 2.3.0
@@ -498,8 +498,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.1
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       minimatch:
         specifier: ^9.0.1
         version: 9.0.1
@@ -1428,6 +1428,7 @@ packages:
 
   deep-diff@1.0.2:
     resolution: {integrity: sha512-aWS3UIVH+NPGCD1kki+DCU9Dua032iSsO43LqQpcs4R3+dVv7tX0qBGjiVHJHjplsoUM2XRO/KB92glqc68awg==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
@@ -2233,8 +2234,8 @@ packages:
   lodash.union@4.6.0:
     resolution: {integrity: sha512-c4pB2CdGrGdjMKYLA+XiRDO7Y0PRQbm/Gzg8qMj+QH+pFVAoTp5sBpO0odL3FjoPCGjK96p6qsP+yQoiLoOBcw==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
@@ -3577,7 +3578,7 @@ snapshots:
       is-keyword-js: 1.0.3
       js-tokens: 3.0.2
       js-yaml: 4.1.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       merge-source-map: 1.1.0
       source-map: 0.5.7
 
@@ -3593,7 +3594,7 @@ snapshots:
       is-keyword-js: 1.0.3
       js-tokens: 3.0.2
       js-yaml: 4.1.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       merge-source-map: 1.1.0
       source-map: 0.5.7
 
@@ -3627,7 +3628,7 @@ snapshots:
   '@serverless-devs/utils@0.0.14':
     dependencies:
       js-yaml: 4.1.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       md5: 2.3.0
       minimist: 1.2.8
       random-string: 0.2.0
@@ -3635,7 +3636,7 @@ snapshots:
   '@serverless-devs/utils@0.0.16-beta.1':
     dependencies:
       js-yaml: 4.1.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       md5: 2.3.0
       minimist: 1.2.8
       random-string: 0.2.0
@@ -4708,7 +4709,7 @@ snapshots:
       cli-width: 3.0.0
       external-editor: 3.1.0
       figures: 3.2.0
-      lodash: 4.17.21
+      lodash: 4.17.23
       mute-stream: 0.0.8
       ora: 5.4.1
       run-async: 2.4.1
@@ -5226,7 +5227,7 @@ snapshots:
 
   lodash.union@4.6.0: {}
 
-  lodash@4.17.21: {}
+  lodash@4.17.23: {}
 
   log-symbols@4.1.0:
     dependencies:
