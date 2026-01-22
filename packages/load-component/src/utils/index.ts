@@ -14,7 +14,11 @@ export function readJsonFile(filePath: string) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) { }
+    } catch (error) {
+      console.log(`[readJsonFile] Failed to parse JSON file: ${filePath}`);
+      console.log(`[readJsonFile] Error message: ${error instanceof Error ? error.message : String(error)}`);
+      console.log(`[readJsonFile] Error stack: ${error instanceof Error ? error.stack : 'No stack trace'}`);
+    }
   }
 }
 
@@ -37,6 +41,10 @@ const getEntryFile = async (componentPath: string, logger: any) => {
     const indexPath = path.resolve(componentPath, './index.js');
     if (fs.existsSync(indexPath)) return indexPath;
     // No valid entry file found
+    console.log('componentPath: ', componentPath);
+    if (fsStat.isDirectory()) {
+      console.log('component path files: ', fs.readdirSync(componentPath));
+    }
     console.log(`fsStat: ${JSON.stringify(fsStat)}`);
     console.log(`packageInfo: ${JSON.stringify(packageInfo)}`);
     console.log(`tsconfigPath: ${tsconfigPath}`);
