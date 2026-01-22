@@ -16,7 +16,7 @@
     "url": "https://github.com/Serverless-Devs/toolkit"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "loopback-filters": "^1.1.1",
     "lowdb": "^6.0.1"
   },
