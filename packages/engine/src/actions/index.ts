@@ -262,6 +262,8 @@ You can still use them now, but we suggest to modify them.`)
           level: isResourceLevel ? 'resource' : 'project',  // 'resource'=资源级别, 'project'=项目级别（全局）
           projectName: this.option.appName || undefined,    // 项目名称（s.yaml的name字段）
           resourceName: isResourceLevel ? (this.option.projectName || undefined) : undefined,  // 资源名称（仅resource级别有值）
+          resourceComponent: isResourceLevel ? get(inputs, 'resource.component') : undefined,  // 资源所属组件名称（仅resource级别有值）
+          pluginName: hook.value, // 插件名称
         },
       };
       // Execute the plugin with the determined inputs and provided arguments.
