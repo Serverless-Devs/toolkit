@@ -231,3 +231,8 @@ const getSchema = async (componentName: string, logger: any) => {
   if (!instance || !instance.getSchema) return null;
   return instance.getSchema();
 };
+
+export const getLastNameFromPath = (path: string) => {
+  if (!path) return '';
+  path.split('/').pop();
+}

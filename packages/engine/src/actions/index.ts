@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { spawn } from 'child_process';
 import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
-import { getAllowFailure, getProcessTime, stringify } from '../utils';
+import { getAllowFailure, getLastNameFromPath, getProcessTime, stringify } from '../utils';
 import chalk from 'chalk';
 import { ILoggerInstance } from '@serverless-devs/logger';
 import { EXIT_CODE } from '../constants';
@@ -263,7 +263,8 @@ You can still use them now, but we suggest to modify them.`)
           projectName: this.option.appName || undefined,    // 项目名称（s.yaml的name字段）
           resourceName: isResourceLevel ? (this.option.projectName || undefined) : undefined,  // 资源名称（仅resource级别有值）
           resourceComponent: isResourceLevel ? get(inputs, 'resource.component') : undefined,  // 资源所属组件名称（仅resource级别有值）
-          pluginName: hook.value, // 插件名称
+          pluginPath: hook.value, // 插件绝对路径
+          pluginName: getLastNameFromPath(hook.value), // 插件名称
         },
       };
       // Execute the plugin with the determined inputs and provided arguments.
