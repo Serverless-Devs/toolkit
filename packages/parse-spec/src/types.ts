@@ -41,6 +41,7 @@ export interface IPluginAction {
   level: `${IActionLevel}`;
   projectName: string;
   allow_failure?: boolean | IAllowFailure;
+  replace_output?: boolean;
 }
 export interface IComponentAction {
   hookType: `${IHookType}`;

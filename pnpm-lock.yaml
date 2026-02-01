@@ -221,8 +221,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.16-beta.24
-        version: 4.13.16-beta.24
+        specifier: ^4.13.16-beta.39
+        version: 4.13.16-beta.39
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -344,8 +344,8 @@ importers:
         specifier: ^4.3.4
         version: 4.3.4
       '@serverless-devs/art-template':
-        specifier: ^4.13.16-beta.24
-        version: 4.13.16-beta.24
+        specifier: ^4.13.16-beta.39
+        version: 4.13.16-beta.39
       '@serverless-devs/credential':
         specifier: workspace:^
         version: link:../credential
@@ -394,8 +394,8 @@ importers:
   packages/registry:
     dependencies:
       '@serverless-devs/art-template':
-        specifier: 4.13.16-beta.38
-        version: 4.13.16-beta.38
+        specifier: 4.13.16-beta.39
+        version: 4.13.16-beta.39
       '@serverless-devs/utils':
         specifier: workspace:^
         version: link:../utils
@@ -851,12 +851,8 @@ packages:
       supports-color:
         optional: true
 
-  '@serverless-devs/art-template@4.13.16-beta.24':
-    resolution: {integrity: sha512-TKK3WBpa4shDLO9wJXtipdobnAv27Hdm3DhPgpSaSrz+rYXV3f1mY2Ln3ZrSoD/OY/YXAY3VYLKd8EMhIBswXQ==}
-    engines: {node: '>= 1.0.0'}
-
-  '@serverless-devs/art-template@4.13.16-beta.38':
-    resolution: {integrity: sha512-4Sjc8UwsVhI2tDKunjS+2HUDCdyy9WU3uGc+0Wrl6gxHzjCy5o8FONzeKndj+BgySQj1Kp2VQBE1nfYTGw3z7A==}
+  '@serverless-devs/art-template@4.13.16-beta.39':
+    resolution: {integrity: sha512-mKPvRUi2jAlmC1xG0efeosaP6ltPK5XMdlhwJxZfxVIg2o+REQMqBU3yUVzESq5fHaQKxElX8mtI2HaRv8NdKw==}
     engines: {node: '>= 1.0.0'}
 
   '@serverless-devs/credentials@2.2.6':
@@ -3565,23 +3561,7 @@ snapshots:
     dependencies:
       ms: 2.1.2
 
-  '@serverless-devs/art-template@4.13.16-beta.24':
-    dependencies:
-      '@serverless-devs/secret': 0.0.2-beta.4
-      '@serverless-devs/utils': 0.0.14
-      acorn: 5.7.4
-      escodegen: 1.14.3
-      estraverse: 4.3.0
-      fs-extra: 11.1.1
-      html-minifier: 3.5.21
-      is-keyword-js: 1.0.3
-      js-tokens: 3.0.2
-      js-yaml: 4.1.0
-      lodash: 4.17.21
-      merge-source-map: 1.1.0
-      source-map: 0.5.7
-
-  '@serverless-devs/art-template@4.13.16-beta.38':
+  '@serverless-devs/art-template@4.13.16-beta.39':
     dependencies:
       '@serverless-devs/secret': 0.0.2-beta.4
       '@serverless-devs/utils': 0.0.14

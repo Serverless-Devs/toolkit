@@ -14,34 +14,55 @@ export function readJsonFile(filePath: string) {
     const data = fs.readFileSync(filePath, 'utf8');
     try {
       return JSON.parse(data);
-    } catch (error) { }
+    } catch (error) {
+      console.log(`[readJsonFile] Failed to parse JSON file: ${filePath}`);
+      console.log(`[readJsonFile] Error message: ${error instanceof Error ? error.message : String(error)}`);
+      console.log(`[readJsonFile] Error stack: ${error instanceof Error ? error.stack : 'No stack trace'}`);
+    }
   }
 }
 
-const getEntryFile = async (componentPath: string) => {
-  const fsStat = await fs.stat(componentPath);
-  if (fsStat.isFile() || !fsStat.isDirectory()) return componentPath;
-  const packageInfo: any = readJsonFile(path.resolve(componentPath, 'package.json'));
-  // First look for main under the package json file
-  let entry = get(packageInfo, 'main');
-  if (entry) return path.resolve(componentPath, entry);
-  // Second check the out dir under the tsconfig json file
-  const tsconfigPath = path.resolve(componentPath, 'tsconfig.json');
-  const tsconfigInfo = readJsonFile(tsconfigPath);
-  entry = get(tsconfigInfo, 'compilerOptions.outDir');
-  if (entry) return path.resolve(componentPath, entry);
-  // Third look for src index js
-  const srcIndexPath = path.resolve(componentPath, './src/index.js');
-  if (fs.existsSync(srcIndexPath)) return srcIndexPath;
-  const indexPath = path.resolve(componentPath, './index.js');
-  if (fs.existsSync(indexPath)) return indexPath;
-  throw new Error(
-    'The component cannot be required. Please check whether the setting of the component entry file is correct. In the current directory, first look for main under the package json file, secondly look for compiler options out dir under the tsconfig json file, thirdly look for src index js, and finally look for index js',
-  );
+const getEntryFile = async (componentPath: string, logger: any) => {
+  try {
+    const fsStat = await fs.stat(componentPath);
+    if (fsStat.isFile() || !fsStat.isDirectory()) return componentPath;
+    const packageInfo: any = readJsonFile(path.resolve(componentPath, 'package.json'));
+    // First look for main under the package json file
+    let entry = get(packageInfo, 'main');
+    if (entry) return path.resolve(componentPath, entry);
+    // Second check the out dir under the tsconfig json file
+    const tsconfigPath = path.resolve(componentPath, 'tsconfig.json');
+    const tsconfigInfo = readJsonFile(tsconfigPath);
+    entry = get(tsconfigInfo, 'compilerOptions.outDir');
+    if (entry) return path.resolve(componentPath, entry);
+    // Third look for src index js
+    const srcIndexPath = path.resolve(componentPath, './src/index.js');
+    if (fs.existsSync(srcIndexPath)) return srcIndexPath;
+    const indexPath = path.resolve(componentPath, './index.js');
+    if (fs.existsSync(indexPath)) return indexPath;
+    // No valid entry file found
+    console.log('componentPath: ', componentPath);
+    if (fsStat.isDirectory()) {
+      console.log('component path files: ', fs.readdirSync(componentPath));
+    }
+    console.log(`fsStat: ${JSON.stringify(fsStat)}`);
+    console.log(`packageInfo: ${JSON.stringify(packageInfo)}`);
+    console.log(`tsconfigPath: ${tsconfigPath}`);
+    console.log(`tsconfigInfo: ${JSON.stringify(tsconfigInfo)}`);
+    console.log(`srcIndexPath: ${srcIndexPath}`);
+    console.log(`indexPath: ${indexPath}`);
+    throw new Error('No valid entry file found');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.log(errorMessage);
+    throw new Error(
+      'The component cannot be required. Please check whether the setting of the component entry file is correct. In the current directory, first look for main under the package json file, secondly look for compiler options out dir under the tsconfig json file, thirdly look for src index js, and finally look for index js',
+    );
+  }
 };
 
 export const buildComponentInstance = async (componentPath: string, params?: any, cleanCache: boolean = false) => {
-  const requirePath = await getEntryFile(componentPath);
+  const requirePath = await getEntryFile(componentPath, params.logger || console);
   // bug: `- component: fc invoke` timeout. Delete require cache
   if (cleanCache && require.cache[requirePath]) {
     try {

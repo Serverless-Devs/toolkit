@@ -121,6 +121,7 @@ class Engine {
     // 初始化全局的 action
     this.globalActionInstance = new Actions(yaml.actions, {
       hookLevel: IActionLevel.GLOBAL,
+      appName: get(this.spec, 'yaml.appName'),  // 项目名称
       logger: this.logger,
       skipActions: this.spec.skipActions,
     });
@@ -393,19 +394,51 @@ class Engine {
       const projectInfo = get(this.info, item.projectName);
       if (!projectInfo || isEmpty(projectInfo) || isNil(projectInfo)) {
         this.logger.write(`${chalk.gray(`execute info command of [${item.projectName}]...`)}`);
+        let args = cloneDeep(this.options.args);
+        if (args) {
+          args[0] = 'info';
+        }
+        // 20250520: support action for ${resources.xx.info.xx}
+        const newParseSpecInstance = new ParseSpec(get(this.spec, 'yaml.path'), {
+          argv: args,
+          logger: this.logger,
+        });
+        newParseSpecInstance.start();
+        const newAction = newParseSpecInstance.parseActions(item.actions, IActionLevel.PROJECT);
+        const newActionInstance = new Actions(newAction, {
+          hookLevel: IActionLevel.PROJECT,
+          projectName: item.projectName,              // 资源名称
+          appName: get(this.spec, 'yaml.appName'),    // 项目名称
+          logger: item.logger,
+          skipActions: this.spec.skipActions,
+        });
+        newActionInstance.setValue('magic', await this.getFilterContext(item));
+        newActionInstance.setValue('step', item);
+        newActionInstance.setValue('command', 'info');
+        const newInputs = await this.getProps(item);
+        newActionInstance.setValue('componentProps', newInputs);
+        const pluginResult = await this.actionInstance?.start(IHookType.PRE, newInputs) || {};
         const spec = cloneDeep(this.spec);
         spec['command'] = 'info';
         // 20240912 when -f, don't throw error
-        const { f, force } = parseArgv(this.options.args);
-        let res = {}
-        if (f || force) {
-          try {
-            res = await this.doSrc(item, {}, spec);
-          } catch(e) {
-            this.logger.warn(get(e, 'data'));
+        // 20250521: remove previous logic
+        let res: any = {}
+        try {
+          res = await this.doSrc(item, pluginResult, spec);
+          set(newInputs, 'output', res);
+          const pluginSuccessResult = await newActionInstance?.start(IHookType.SUCCESS, newInputs);
+          if (!isEmpty(pluginSuccessResult)) {
+            res = get(pluginSuccessResult, 'step.output');
           }
-        } else {
-          res = await this.doSrc(item, {}, spec);
+        } catch (e) {
+          this.logger.warn(get(e, 'data'));
+          // 将error信息添加到inputs中传递给fail hook
+          set(newInputs, 'errorContext', e);
+          res = get(await newActionInstance?.start(IHookType.FAIL, newInputs), 'step.output') || {};
+        }
+        const pluginCompleteResult = await newActionInstance?.start(IHookType.COMPLETE, newInputs);
+        if (!isEmpty(pluginCompleteResult)) {
+          res = get(pluginCompleteResult, 'step.output');
         }
         set(this.info, item.projectName, res);
         this.logger.write(`${chalk.gray(`[${item.projectName}] info command executed.`)}`);
@@ -501,7 +534,12 @@ class Engine {
     } catch (error) {
       // On error, attempt to trigger the project's fail hook and update the recorded context.
       try {
-        const res = await this.actionInstance?.start(IHookType.FAIL, this.record.componentProps);
+        // 将error信息添加到inputs中传递给fail hook
+        const failInputs = {
+          ...this.record.componentProps,
+          errorContext: error,
+        };
+        const res = await this.actionInstance?.start(IHookType.FAIL, failInputs);
         this.recordContext(item, get(res, 'pluginOutput', {}));
       } catch (error) {
         this.record.status = STEP_STATUS.FAILURE;
@@ -529,10 +567,13 @@ class Engine {
 
     // Attempt to trigger the project's complete hook regardless of status.
     try {
-      const res = await this.actionInstance?.start(IHookType.COMPLETE, {
+      // complete hook需要包含error信息（如果有的话）
+      const completeInputs = {
         ...this.record.componentProps,
         output: get(item, 'output', {}),
-      });
+        errorContext: get(item, 'error'),
+      };
+      const res = await this.actionInstance?.start(IHookType.COMPLETE, completeInputs);
       this.recordContext(item, get(res, 'pluginOutput', {}));
     } catch (error) {
       this.record.status = STEP_STATUS.FAILURE;
@@ -578,7 +619,8 @@ class Engine {
       debug(`project actions: ${JSON.stringify(newAction)}`);
       this.actionInstance = new Actions(newAction, {
         hookLevel: IActionLevel.PROJECT,
-        projectName: item.projectName,
+        projectName: item.projectName,              // 资源名称
+        appName: get(this.spec, 'yaml.appName'),    // 项目名称
         logger: item.logger,
         skipActions: this.spec.skipActions,
       });

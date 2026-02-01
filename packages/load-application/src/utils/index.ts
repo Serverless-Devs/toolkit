@@ -34,6 +34,11 @@ export const getDefaultValue = (value: any) => {
   return replace(value, RANDOM_PATTERN, randomId());
 };
 
+export const getNumberDefaultValue = (value: any) => {
+  if (typeof value !== 'number') return;
+  return value;
+};
+
 export const getSecretManager = () => {
   const secretManager = SecretManager.getInstance();
   return secretManager;

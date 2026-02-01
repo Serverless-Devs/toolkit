@@ -1,12 +1,12 @@
 import { IAction, IActionLevel, IActionType, IAllowFailure, IComponentAction, IHookType, IPluginAction, IRunAction, getInputs } from '@serverless-devs/parse-spec';
-import { isEmpty, filter, includes, set, get } from 'lodash';
+import { isEmpty, filter, includes, set, get, cloneDeep } from 'lodash';
 import * as utils from '@serverless-devs/utils';
 import { DevsError, ETrackerType } from '@serverless-devs/utils';
 import fs from 'fs-extra';
 import { spawn } from 'child_process';
 import loadComponent from '@serverless-devs/load-component';
 import stringArgv from 'string-argv';
-import { getAllowFailure, getProcessTime, stringify } from '../utils';
+import { getAllowFailure, getLastNameFromPath, getProcessTime, stringify } from '../utils';
 import chalk from 'chalk';
 import { ILoggerInstance } from '@serverless-devs/logger';
 import { EXIT_CODE } from '../constants';
@@ -27,7 +27,8 @@ interface IRecord {
 
 interface IOptions {
   hookLevel: `${IActionLevel}`;
-  projectName?: string;
+  projectName?: string;   // 资源名称（resources下的key）
+  appName?: string;       // 项目名称（s.yaml的name字段）
   logger: ILoggerInstance;
   skipActions?: boolean;
 }
@@ -246,8 +247,32 @@ You can still use them now, but we suggest to modify them.`)
       const instance = await loadComponent(hook.value, { logger: this.logger });
       // Determine the inputs for the plugin based on the record's pluginOutput.
       const inputs = isEmpty(this.record.pluginOutput) ? this.inputs : this.record.pluginOutput;
+      // 添加hook上下文信息
+      // level: 'resource' 表示资源级别hook, 'project' 表示项目级别hook（全局）
+      const isResourceLevel = this.option.hookLevel === IActionLevel.PROJECT;
+      const command = this.record.command || '';
+      const hookType = hook.hookType || '';
+      const inputsWithHookContext = {
+        ...inputs,
+        hookContext: {
+          hookType: hookType,                               // 例如: 'pre', 'fail', 'success', 'complete'
+          hookName: command ? `${hookType}-${command}` : hookType,  // 例如: 'fail-deploy', 'complete-deploy'
+          command: command,                                 // 例如: 'deploy', 'remove'
+          actionType: hook.actionType || 'plugin',          // 'plugin'
+          level: isResourceLevel ? 'resource' : 'project',  // 'resource'=资源级别, 'project'=项目级别（全局）
+          projectName: this.option.appName || undefined,    // 项目名称（s.yaml的name字段）
+          resourceName: isResourceLevel ? (this.option.projectName || undefined) : undefined,  // 资源名称（仅resource级别有值）
+          resourceComponent: isResourceLevel ? get(inputs, 'resource.component') : undefined,  // 资源所属组件名称（仅resource级别有值）
+          pluginPath: hook.value, // 插件绝对路径
+          pluginName: getLastNameFromPath(hook.value), // 插件名称
+        },
+      };
       // Execute the plugin with the determined inputs and provided arguments.
-      this.record.pluginOutput = await instance(inputs, hook.args, this.logger);
+      this.record.pluginOutput = await instance(inputsWithHookContext, hook.args, this.logger);
+      // If prop 'replace_output' is true, replace the record's step output with the plugin output.
+      if (hook.replace_output) {
+        this.record.step.output = cloneDeep(this.record.pluginOutput);
+      }
     } catch (e) {
       const error = e as Error;
       // Check if the failure is allowed based on the record's allowFailure setting.
